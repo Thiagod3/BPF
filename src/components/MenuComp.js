@@ -1,23 +1,26 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const MenuComp = () => {
 
+    const navigation = useNavigation(); 
+
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Matches")}}>
                 <MaterialCommunityIcons name="flag-variant" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Partidas</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Players")}}>
                 <MaterialCommunityIcons name="run" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Jogadores</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Profile")}}>
                 <Ionicons name="person-sharp" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Perfil</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} >
             <MaterialCommunityIcons name="account-group" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Time</Text>
             </TouchableOpacity>

@@ -1,13 +1,10 @@
-import Routes from './src/screens/Profile';
-import {View} from 'react-native';
+// Importar o arquivo com as rotas
+import Routes from "./src/routes/routes";
 
+const App = () => {
 
-const LoginScreen = () => {
-  return (
-    <View>
-       <Routes></Routes>
-    </View>    
-  );
-};
+  // Carregar o arquivo de rotas
+  return <Routes />;
+}
 
-export default LoginScreen;
+export default App;

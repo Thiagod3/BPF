@@ -69,7 +69,7 @@ const CreateMatchComp = () => {
     console.log(match)
 
     try {
-      const response = await fetch('http://192.168.42.69:5000/api/matches/create', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/matches/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

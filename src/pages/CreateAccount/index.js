@@ -49,7 +49,7 @@ export default function CreateAccount() {
 
     try {
       const response = await fetch(
-        "http://192.168.42.69:5000/api/users/create",
+        `${process.env.REACT_APP_API_URL}/api/users/create`,
         {
           method: "POST",
           headers: {

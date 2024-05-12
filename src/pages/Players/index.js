@@ -13,7 +13,7 @@ export default function Players() {
     // Função para buscar usuários da API
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://192.168.42.69:5000/api/users");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users`);
         if (!response.ok) {
           throw new Error("Erro ao buscar usuários: " + response.statusText);
         }

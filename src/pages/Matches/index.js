@@ -21,7 +21,7 @@ export default function Matches() {
     // Função para buscar Partidas da API
     const fetchMatchs = async () => {
       try {
-        const response = await fetch("http://192.168.42.69:5000/api/matches");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/matches`);
         if (!response.ok) {
           throw new Error("Erro ao buscar partidas: " + response.statusText);
         }

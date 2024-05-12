@@ -1,17 +1,13 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
 const PlayerCardComp = ({ name, position, image }) => {
-
   return (
     <View style={styles.container}>
       <View style={styles.profile}>
-        <Image source={{ uri: `${image}` }} style={styles.profilePic} />
+        <Image 
+          source={{ uri: `${image}}` }} 
+          style={styles.profilePic} 
+        />
         <Text style={styles.profileText}>{position}</Text>
       </View>
       <Text style={styles.containerText}>{name}</Text>

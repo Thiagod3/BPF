@@ -10,6 +10,7 @@ import Login from '../pages/Login';
 import Matches from "../pages/Matches";
 import Players from "../pages/Players";
 import Profile from "../pages/Profile";
+import Team from "../pages/Team";
 
 export default function Routes(){
     return (
@@ -48,6 +49,12 @@ export default function Routes(){
             <Stack.Screen 
                 name="Profile"
                 component={Profile}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen 
+                name="Team"
+                component={Team}
                 options={{ headerShown: false }}
             />
 

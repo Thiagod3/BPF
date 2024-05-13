@@ -1,6 +1,25 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
 const PlayerCardComp = ({ name, position, image }) => {
+
+  function mapPositionToCode(position) {
+
+    const lowerCasePosition = position.toLowerCase();
+
+    switch (lowerCasePosition) {
+      case "atacante":
+        return "ATA";
+      case "goleiro":
+        return "GOL";
+      case "Zagueiro":
+        return "ZAG";
+      case "meio de campo":
+        return "MC";
+      default:
+        return "ND";
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.profile}>
@@ -8,7 +27,7 @@ const PlayerCardComp = ({ name, position, image }) => {
           source={{ uri: `${image}}` }} 
           style={styles.profilePic} 
         />
-        <Text style={styles.profileText}>{position}</Text>
+        <Text style={styles.profileText}>{mapPositionToCode(position)}</Text>
       </View>
       <Text style={styles.containerText}>{name}</Text>
     </View>

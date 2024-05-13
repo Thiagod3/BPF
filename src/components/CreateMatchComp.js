@@ -203,7 +203,7 @@ const CreateMatchComp = () => {
       </View> */}
 
       <FAB
-        title="bora pro fut!!"
+        title="criar partida!!"
         color="#113B8F"
         onPress={insereDados}
         titleStyle={{ color: "#FF731D", fontWeight: "bold", fontSize: 20 }}

@@ -11,6 +11,7 @@ import Matches from "../pages/Matches";
 import Players from "../pages/Players";
 import Profile from "../pages/Profile";
 import Team from "../pages/Team";
+import CreateTeam from "../pages/CreateTeam";
 
 export default function Routes(){
     return (
@@ -55,6 +56,12 @@ export default function Routes(){
             <Stack.Screen 
                 name="Team"
                 component={Team}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen 
+                name="CreateTeam"
+                component={CreateTeam}
                 options={{ headerShown: false }}
             />
 

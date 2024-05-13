@@ -1,10 +1,13 @@
 import {View,StyleSheet, Text, ScrollView} from 'react-native';
+import { useNavigation } from "@react-navigation/native";
 import { FAB } from "@rneui/themed";
 import { Ionicons } from '@expo/vector-icons';
 
 
 
 export default function CreateTeamComp() {
+
+    const navigation = useNavigation(); 
 
     return(
             <View style={styles.container}>
@@ -20,6 +23,7 @@ export default function CreateTeamComp() {
                     titleStyle={{ color: "#FF731D", fontWeight: "bold", fontSize: 20 }}
                     upperCase
                     icon={<Ionicons name="add-circle-outline" size={30} color="#FF731D" />}
+                    onPress={() => {navigation.replace("CreateTeam")}}
                 />
             </View>
     );

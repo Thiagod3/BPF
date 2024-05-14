@@ -12,6 +12,7 @@ import Players from "../pages/Players";
 import Profile from "../pages/Profile";
 import Team from "../pages/Team";
 import CreateTeam from "../pages/CreateTeam";
+import Rank from "../pages/Rank/rank";
 
 export default function Routes(){
     return (
@@ -62,6 +63,12 @@ export default function Routes(){
             <Stack.Screen 
                 name="CreateTeam"
                 component={CreateTeam}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen 
+                name="Rank"
+                component={Rank}
                 options={{ headerShown: false }}
             />
 

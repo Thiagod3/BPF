@@ -201,6 +201,18 @@ app.get("/api/matches", (req, res) => {
   });
 });
 
+// Rota para buscar todos os times
+app.get("/api/teams", (req, res) => {
+  const query = "SELECT * FROM Teams";
+  conn.query(query, (err, results) => {
+    if (err) {
+      console.error("Erro ao executar a consulta:", err.message);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    } else {
+      res.json(results);
+    }
+  });
+});
 
 
 // Iniciando o servidor

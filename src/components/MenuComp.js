@@ -28,7 +28,7 @@ const MenuComp = () => {
                 <Ionicons name="chatbubble-ellipses-sharp" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Conversas</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => {navigation.replace("Rank")}}>
                 <MaterialCommunityIcons name="trophy-award" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Rank geral</Text>
             </TouchableOpacity>            

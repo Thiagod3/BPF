@@ -16,6 +16,13 @@ import com.facebook.soloader.SoLoader;
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
 
+<<<<<<< HEAD
+// Dentro da função getPackages
+new RNDateTimePickerPackage()
+
+
+=======
+>>>>>>> origin/back
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {

@@ -1,87 +1,151 @@
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const MatchCardComp = () => {
+import Modal from "./layout/Modal";
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.team}>
-                <Image 
-                    source={require("../../assets/profile-pic.png")}
-                    style={styles.teamPic}
-                    />
-                    <Text style={styles.teamName}>Gigante da Colina</Text>
-            </View>
-            
-            <View style={styles.infoContainer}>
-                <View style={styles.info}>
-                    <Text style={styles.infoText}>Campo: </Text>
-                    <Text style={styles.infoText}>Society</Text>
-                </View>
-                <View style={styles.info}>
-                    <Text style={styles.infoText}>Valor: </Text>
-                    <Text style={styles.infoText}>Grátis</Text>
-                </View>
-            </View>
+const MatchCardComp = ({
+  id,
+  name,
+  image,
+  location,
+  paid,
+  field,
+  organizer,
+}) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const matchId = id;
 
-            <View style={styles.address}>
-                <Ionicons name="location-outline" size={30} color="black" />
-                <Text style={styles.addressText}>Rua dos bobos, 0</Text>
-                <TouchableOpacity>
-                    <Ionicons name="chevron-forward" size={36} color="black" />
-                </TouchableOpacity>                
-            </View>
-        </View>
-    );
-}
+  const [match, setMatch] = useState();
+
+  async function showMatch() {
+    try {
+      const response = await fetch(
+        `http://192.168.42.69:5000/api/matches/${matchId}`
+      );
+      if (!response.ok) {
+        throw new Error(
+          "Erro ao buscar partida especifica: " + response.statusText
+        );
+      }
+      const data = await response.json();
+      //console.log("Partida recebida:", data); // Log para verificar os dados recebidos
+      setMatch(data);
+
+      showMatchData();
+    } catch (error) {
+      console.error(error);
+      setError(
+        "Erro ao buscar a partida especifica. Verifique sua conexão e tente novamente."
+      );
+    }
+  }
+
+  async function showMatchData() {
+    setModalVisible(true);
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.team}>
+        <Image source={{ uri: `${image}` }} style={styles.teamPic} />
+        <Text style={styles.teamName}>{name}</Text>
+      </View>
+
+      <View style={styles.infoContainer}>
+        {/* <View style={styles.info}>
+          <Text style={styles.infoText}>Campo: </Text>
+          <Text style={styles.infoText}>
+            {field === 0 ? "Areia" : field === 1 ? "Society" : "Gramado"}
+          </Text>
+        </View> */}
+        {/* <View style={styles.info}>
+          <Text style={styles.infoText}>Pago: </Text>
+          <Text style={styles.infoText}>
+            {paid === 0 ? "Sim" : "Não"}
+          </Text>
+        </View> */}
+      </View>
+
+      <View style={styles.address}>
+        <Ionicons name="location-outline" size={30} color="black" />
+        <Text style={styles.addressText}>{location}</Text>
+      </View>
+      <TouchableOpacity onPress={showMatch} style={styles.seeMore}>
+          <Text style={styles.seeMoreText}>Ver mais</Text>
+          <Ionicons name="chevron-forward" size={36} color="black" />
+      </TouchableOpacity>
+
+      {/* Modal para mostrar detalhes da partida */}
+      <Modal
+        visible={modalVisible} // Passando a visibilidade do modal como propriedade
+        onClose={() => setModalVisible(false)} // Função para fechar o modal
+        id={id}
+        location={location}
+        field={field}
+        paid={paid}
+        organizer={organizer}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 320,
-        padding: 50,
-        margin: 10,
-        gap: 15,
-        borderRadius: 10,
-        backgroundColor: '#D9D9D9',
-    },
-    teamName:{
-        paddingTop: 15,
-        fontWeight: 'bold',
-        fontSize: 26,
-    },
-    team: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: -10
-    },
-    teamPic: {
-        height: 120,
-        width: 120,
-        borderRadius: 100,
-    },
-    infoContainer: {
-        width: '100%',
-        alignItems: 'flex-start',
-        gap: 10
-    },
-    info: {
-        flexDirection: 'row',
-    },
-    infoText: {
-        fontSize: 16,
-    },
-    address: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        gap: 10
-    },
-    addressText: {
-        fontSize: 20,
-    },
-})
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 320,
+    padding: 50,
+    margin: 10,
+    gap: 15,
+    borderRadius: 10,
+    backgroundColor: "#D9D9D9",
+  },
+  teamName: {
+    paddingTop: 15,
+    fontWeight: "bold",
+    fontSize: 26,
+  },
+  team: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: -10,
+  },
+  teamPic: {
+    height: 120,
+    width: 120,
+    borderRadius: 100,
+  },
+  infoContainer: {
+    width: "100%",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  info: {
+    flexDirection: "row",
+  },
+  infoText: {
+    fontSize: 16,
+  },
+  address: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    gap: 10,
+  },
+  addressText: {
+    fontSize: 20,
+  },
+  seeMore: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    fontSize: 23,
+  },
+  seeMoreText: {
+    fontSize: 23,
+  }
+});
 
 export default MatchCardComp;

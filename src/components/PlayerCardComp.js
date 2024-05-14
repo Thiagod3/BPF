@@ -1,14 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import renderImage from "../utils/renderImage";
+
+//utils criadas
+import mapPositionToCode from "../utils/mapPositionToCode";
 
 const PlayerCardComp = ({ name, position, image }) => {
+
   return (
     <View style={styles.container}>
       <View style={styles.profile}>
-        <Image 
-          source={{ uri: `${image}}` }} 
-          style={styles.profilePic} 
-        />
-        <Text style={styles.profileText}>{position}</Text>
+        {renderImage(image)}
+        <Text style={styles.profileText}>{mapPositionToCode(position)}</Text>
       </View>
       <Text style={styles.containerText}>{name}</Text>
     </View>
@@ -43,11 +45,6 @@ const styles = StyleSheet.create({
     color: "#F2F2F2",
     backgroundColor: "#113B8F",
     borderRadius: 10,
-  },
-  profilePic: {
-    height: 150,
-    width: 150,
-    borderRadius: 100,
   },
 });
 

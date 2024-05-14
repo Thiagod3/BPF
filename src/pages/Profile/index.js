@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Platform,
 } from "react-native";
 import Header from "../../components/HeaderComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,7 +16,11 @@ import { useState, useEffect } from "react";
 import EditProfile from "../../components/EditProfileComp";
 import { useNavigation } from "@react-navigation/native";
 
+//Utils criadas
+import mapPositionToCode from "../../utils/mapPositionToCode";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import renderImage from "../../utils/renderImage";
 
 export default function Profile() {
   const navigation = useNavigation();
@@ -25,6 +30,8 @@ export default function Profile() {
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
+
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -88,26 +95,6 @@ export default function Profile() {
     setOpt(!opt);
   };
 
-  function mapPositionToCode(position) {
-
-    const lowerCasePosition = position.toLowerCase();
-
-    switch (lowerCasePosition) {
-      case "atacante":
-        return "ATA";
-      case "goleiro":
-        return "GOL";
-      case "Zagueiro":
-        return "ZAG";
-      case "meio de campo":
-        return "MC";
-      default:
-        return "ND";
-    }
-  }
-
-
-
   return (
     <View style={styles.container}>
       <ScrollView style={styles.infoContainer}>
@@ -115,31 +102,30 @@ export default function Profile() {
           <Text style={styles.infoText}>{user.name}</Text>
         </View>
 
-        {team &&
+        {(team &&
           team.length > 0 && ( // Verifica se team não é null e se tem pelo menos um elemento
             <View style={styles.info} id="team">
               <Text style={styles.infoText}>TIME</Text>
               {team[0].image && ( // Verifica se team[0].image não é undefined
-                <Image
-                  source={{ uri: team[0].image }}
-                  style={styles.teamPic}
-                />
+                <Image source={{ uri: team[0].image }} style={styles.teamPic} />
               )}
               <Text style={styles.infoText}>{team[0].team_name}</Text>
             </View>
-          ) || (
-            <View style={styles.info} id="team">
-              <Text style={styles.bio}>Não Possui um Time</Text>
-            </View>
-          )}
+          )) || (
+          <View style={styles.info} id="team">
+            <Text style={styles.bio}>Não Possui um Time</Text>
+          </View>
+        )}
         <Text style={styles.bio}>{user.description}</Text>
       </ScrollView>
 
       <View style={styles.profile}>
         <View style={styles.profile}>
-          <Image source={{ uri: `${user.image}}` }} style={styles.profilePic} />
+          {renderImage(user.image)}
           {user && (
-            <Text style={styles.profileText}>{mapPositionToCode(user.position)}</Text>
+            <Text style={styles.profileText}>
+              {mapPositionToCode(user.position)}
+            </Text>
           )}
         </View>
         <Button
@@ -173,7 +159,7 @@ export default function Profile() {
       >
         <TouchableOpacity
           activeOpacity={1}
-          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.75)" }}
+          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.20)" }}
           onPress={() => setModalVisible(false)}
         ></TouchableOpacity>
         <EditProfile onClose={() => setModalVisible(false)} />

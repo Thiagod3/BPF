@@ -12,8 +12,30 @@ const port = 5000;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//Consultar time
 
+// Rota para receber a imagem e atualizar o banco de dados
+app.post('/api/user/uploadImage', (req, res) => {
+  const { image, userId } = req.body;
+
+  // Insira o código para atualizar o banco de dados com a imagem aqui
+  // Por exemplo, você pode executar uma consulta SQL de atualização
+
+  // Exemplo de consulta de atualização
+  const sql = `UPDATE Users SET image = ? WHERE id = ?`;
+
+  conn.query(sql, [image, userId], (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar o banco de dados:', err);
+      res.status(500).send('Erro ao atualizar o banco de dados');
+      return;
+    }
+    console.log('Imagem atualizada no banco de dados:', result);
+    res.status(200).send('Imagem atualizada com sucesso');
+  });
+});
+
+
+//Consultar time do usuario
 app.get('/api/user/team/:id', (req, res) => {
   const userId = req.params.id;
   const sql = "SELECT t.id, t.name AS team_name, t.image, u.id AS user_id, u.name AS user_name FROM Teams AS t JOIN Users AS u ON u.id = t.user_admin_id WHERE u.id = ?";

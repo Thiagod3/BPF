@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import {
   View,
   ScrollView,
@@ -72,6 +74,31 @@ export default function CreateAccount() {
     }
   };
 
+  const [value, setValue] = useState(null);
+
+    const renderItem = item => {
+      return (
+        <View style={styles.item}>
+          <Text style={styles.textItem}>{item.label}</Text>
+          {item.value === value && (
+            <AntDesign
+              style={styles.icon}
+              color="#D9D9D9"
+              name="Safety"
+              size={20}
+            />
+          )}
+        </View>
+      );
+    };
+
+  const data = [
+    { label: 'Atacante', value: 'atacante' },
+    { label: 'Goleiro(a)', value: 'goleiro' },
+    { label: 'Zagueiro(a)', value: 'zagueiro' },
+    { label: 'Meio campo', value: 'meio de campo' },
+  ];
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -101,13 +128,27 @@ export default function CreateAccount() {
           secureTextEntry
           value={confirmpassword}
           onChangeText={(text) => setConfirmPassword(text)}
-        />
+        />       
 
-        <TextInput
-          style={styles.input}
-          placeholder="Posição  ex: Atacante, Goleiro..."
-          value={position}
-          onChangeText={(text) => setPosition(text)}
+        <Dropdown
+          style={styles.dropdown}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
+          data={data}
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder="Selecione sua posição"
+          value={value}
+          onChange={item => {
+            setPosition(item.value);
+          }}
+          renderLeftIcon={() => (
+            <AntDesign style={styles.icon} color="#808080" name="Safety" size={20} />
+          )}
+          renderItem={renderItem}
         />
 
         <TextInput
@@ -184,5 +225,41 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
     textDecorationLine: "underline",
+  },  
+  
+  dropdown: {
+    width: "100%",
+    height: 50,
+    backgroundColor: '#D9D9D9',
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  item: {
+    padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#D9D9D9',
+  },
+  textItem: {
+    flex: 1,
+    fontSize: 16,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });

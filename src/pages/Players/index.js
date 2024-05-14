@@ -41,6 +41,8 @@ export default function Players() {
     /> // Usando o componente PlayerCard
   );
 
+  
+
   return (
     <View style={styles.container}>
         {/* Adicionei Horizontal true para tirar um erro de VirtualList */}

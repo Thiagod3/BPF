@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import renderImage from "../utils/renderImage";
 
 //utils criadas
+import renderImage from "../utils/renderImage";
 import mapPositionToCode from "../utils/mapPositionToCode";
 
 const PlayerCardComp = ({ name, position, image }) => {

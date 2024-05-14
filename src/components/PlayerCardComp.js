@@ -11,7 +11,7 @@ const PlayerCardComp = ({ name, position, image }) => {
         return "ATA";
       case "goleiro":
         return "GOL";
-      case "Zagueiro":
+      case "zagueiro":
         return "ZAG";
       case "meio de campo":
         return "MC";

@@ -21,7 +21,7 @@ const MatchCardComp = ({
   async function showMatch() {
     try {
       const response = await fetch(
-        `http://192.168.42.69:5000/api/matches/${matchId}`
+        `${process.env.REACT_APP_API_URL}/api/matches/${matchId}`
       );
       if (!response.ok) {
         throw new Error(

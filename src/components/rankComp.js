@@ -55,9 +55,11 @@ export default function RankComp() {
     };
     return(
         <View style={styles.container}>
+            <Text style={styles.rankTitle}>TOP 10</Text>
+            <Text style={styles.rankText}>Partidas</Text>
             <FlatList
                 style={styles.flatList}
-                data={teams}
+                data={teams.slice(0, 10)}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
             />
@@ -74,8 +76,19 @@ const styles = StyleSheet.create({
         height: "85%",
         width: "90%",
         margin: 10,
+        paddingVertical: 10,
         borderRadius: 10,
         backgroundColor: "#D9D9D9",
+      },
+      rankTitle:{
+        fontSize: 30,
+        fontWeight: "bold",
+      },
+      rankText:{
+        width: "100%",
+        paddingHorizontal: 10,
+        textAlign: "right",
+        fontWeight: "500"
       },
       flatList:{
         width:"100%",

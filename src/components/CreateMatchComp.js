@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import {
 import { CheckBox, FAB } from "@rneui/themed";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateMatchComp = () => {
@@ -20,11 +22,88 @@ const CreateMatchComp = () => {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [dateMatch, setDateMatch] = useState("");
+  const [price, setPriceValue] = useState("");
+
+  
+  const [user, setUser] = useState("");
+  const [team, setTeam] = useState("");
+
 
   const [match, setMatch] = useState();
 
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Recupera o token e o ID do usuário do AsyncStorage
+        const token = await AsyncStorage.getItem("token");
+        const userId = await AsyncStorage.getItem("userId");
+
+        // Se não houver token, redireciona para a tela de login
+        if (!token || !userId) {
+          navigation.navigate("Login");
+          return;
+        }
+
+        // Faz uma solicitação ao servidor para obter os dados do usuário
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Erro ao carregar dados do usuário, Erro A");
+        }
+
+        const userData = await response.json();
+        setUser(userData);
+
+        // Após definir o usuário, busque os dados do time
+        fetchUserTeam(userData.id);
+      } catch (error) {
+        console.error("Erro ao carregar dados do usuário:", error);
+        Alert.alert("Erro", "Erro ao carregar dados do usuário");
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const fetchUserTeam = async (userId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/team/${userId}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao carregar dados do time");
+      }
+
+      const teamData = await response.json();
+
+      if (Array.isArray(teamData) && teamData.length > 0) {
+        const teamId = teamData[0].id;
+        setTeam(teamId); // Define apenas o valor do id
+      } else {
+        throw new Error("Formato de dados inesperado");
+      }
+    } catch (error) {
+      console.error("Erro na busca do time:", error);
+    }
+  };
+
+
+
+
+
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -38,7 +117,6 @@ const CreateMatchComp = () => {
       if (Platform.OS === "android") {
         toggleDatePicker();
         setDateMatch(formatDate(currentDate));
-        console.log(dateMatch);
       }
     } else {
       toggleDatePicker();
@@ -62,7 +140,9 @@ const CreateMatchComp = () => {
       location: location,
       field: selectedField,
       paid: selectedPrice,
-      date: dateMatch
+      price: selectedPrice === 1 ? price : null,
+      date: dateMatch,
+      time_organizador_id: team,
     };
 
     setMatch(matchData)
@@ -74,7 +154,7 @@ const CreateMatchComp = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(match)
+        body: JSON.stringify(matchData)
       });
 
       if (!response.ok) {
@@ -91,15 +171,11 @@ const CreateMatchComp = () => {
     <View style={styles.container}>
       <View style={styles.loc}>
         <Text style={styles.locText}>Criar Partida</Text>
-        {/* <Image
-          source={require("../../assets/mapTEMP.png")}
-          style={styles.locPic}
-        /> */}
       </View>
 
       <View style={styles.inputBox}>
         <TextInput
-          placeholder="De uma nome para a partida..."
+          placeholder="De um nome à partida"
           name="location"
           style={styles.input}
           onChangeText={(text) => setName(text)}
@@ -108,7 +184,7 @@ const CreateMatchComp = () => {
 
       <View style={styles.inputBox}>
         <TextInput
-          placeholder="Digite o endereço..."
+          placeholder="Digite o endereço"
           name="location"
           style={styles.input}
           onChangeText={(text) => setLocation(text)}
@@ -187,6 +263,17 @@ const CreateMatchComp = () => {
             checkedColor="#FF731D"
           />
         </View>
+        {selectedPrice === 1 && (
+            <View style={styles.inputBox}>
+              <TextInput
+                placeholder="Digite o preço"
+                style={styles.input}
+                value={price}
+                onChangeText={setPriceValue}
+                keyboardType="numeric"
+              />
+            </View>
+          )}
       </View>
 
       {showPicker && (

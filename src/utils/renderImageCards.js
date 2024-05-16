@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 import { detectImageType, isURL } from './getBase64Type'; // Import the isURL function
 
-const renderImage = (image) => {
+const renderImageCards = (image) => {
   // If the image is a URL, render it directly
   if (isURL(image)) {
     return (
@@ -23,8 +23,8 @@ const renderImage = (image) => {
   }
   const styles = StyleSheet.create({
     profilePic: {
-      height: 150,
-      width: 150,
+      height: 160,
+      width: 160,
       borderRadius: 100,
     },
     profilePicFile: {
@@ -34,4 +34,4 @@ const renderImage = (image) => {
     },
   });
 
-  export default renderImage;
+  export default renderImageCards;

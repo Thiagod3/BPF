@@ -22,7 +22,7 @@ const CreateMatchComp = () => {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [dateMatch, setDateMatch] = useState("");
-  const [price, setPriceValue] = useState("");
+  const [price, setPriceValue] = useState(0);
 
   
   const [user, setUser] = useState("");

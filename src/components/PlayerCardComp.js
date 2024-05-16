@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
 //utils criadas
-import renderImage from "../utils/renderImage";
+import renderImageCards from "../utils/renderImageCards";
 import mapPositionToCode from "../utils/mapPositionToCode";
 
 const PlayerCardComp = ({ name, position, image }) => {
@@ -9,7 +9,7 @@ const PlayerCardComp = ({ name, position, image }) => {
   return (
     <View style={styles.container}>
       <View style={styles.profile}>
-        {renderImage(image)}
+        {renderImageCards(image)}
         <Text style={styles.profileText}>{mapPositionToCode(position)}</Text>
       </View>
       <Text style={styles.containerText}>{name}</Text>

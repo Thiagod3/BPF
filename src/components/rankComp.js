@@ -57,7 +57,7 @@ export default function RankComp() {
         <View style={styles.container}>
             <Text style={styles.rankTitle}>TOP 10</Text>
             <Text style={styles.rankText}>Partidas</Text>
-            <FlatList
+            <FlatList overScrollMode="never"
                 style={styles.flatList}
                 data={teams.slice(0, 10)}
                 renderItem={renderItem}

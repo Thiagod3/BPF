@@ -28,7 +28,7 @@ export default function CreateAccount() {
 
   const handleCreate = async () => {
     //Verifica se dados foram inseridos e são validos
-    if (!email || !username || !password || !confirmpassword || !description || !position) {
+    if (!email || !username || !password || !confirmpassword || !position) {
       Alert.alert("Dado vazio", "Preencha o campo vazio");
       return
     } else if (password !== confirmpassword) {
@@ -43,7 +43,6 @@ export default function CreateAccount() {
       email: email,
       username: username,
       password: password,
-      description: description,
       position: position,
     };
 
@@ -151,21 +150,21 @@ export default function CreateAccount() {
           renderItem={renderItem}
         />
 
-        <TextInput
+        {/* <TextInput
           style={styles.inputDescription}
           placeholder="Descrição do Usuário"
           multiline={true}
           numberOfLines={4}
           value={description}
           onChangeText={(text) => setDescription(text)}
-        />
+        /> */}
 
         <TouchableOpacity
           style={styles.loginButton}
           title="register"
           onPress={handleCreate}
         >
-          <Text style={styles.loginButtonText}>CADASTRAR-SE</Text>
+          <Text style={styles.loginButtonText}>CADASTRAR</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

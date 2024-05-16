@@ -109,7 +109,7 @@ export default function Profile() {
               {team[0].image && ( // Verifica se team[0].image não é undefined
                 <Image source={{ uri: team[0].image }} style={styles.teamPic} />
               )}
-              <Text style={styles.infoText}>{team[0].team_name}</Text>
+              <Text style={styles.infoText}>{team[0].name}</Text>
             </View>
           )) || (
           <View style={styles.info} id="team">
@@ -150,7 +150,7 @@ export default function Profile() {
       </View>
 
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
@@ -159,7 +159,7 @@ export default function Profile() {
       >
         <TouchableOpacity
           activeOpacity={1}
-          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.20)" }}
+          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
           onPress={() => setModalVisible(false)}
         ></TouchableOpacity>
         <EditProfile onClose={() => setModalVisible(false)} />

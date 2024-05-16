@@ -38,7 +38,7 @@ app.post('/api/user/uploadImage', (req, res) => {
 //Consultar time do usuario
 app.get('/api/user/team/:id', (req, res) => {
   const userId = req.params.id;
-  const sql = "SELECT t.id, t.name AS team_name, t.image, u.id AS user_id, u.name AS user_name FROM Teams AS t JOIN Users AS u ON u.id = t.user_admin_id WHERE u.id = ?";
+  const sql = "SELECT t.*, u.id AS user_id, u.name AS user_name FROM Teams AS t JOIN Users AS u ON u.id = t.user_admin_id WHERE u.id = ?";
   conn.query(sql, [userId], (err, results) => {
     if (err) {
       console.error("Erro ao consultar banco de dados:", err);

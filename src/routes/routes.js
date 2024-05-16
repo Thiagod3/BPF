@@ -17,6 +17,7 @@ import Rank from "../pages/Rank/rank";
 export default function Routes(){
     return (
         <NavigationContainer>
+
             <Stack.Navigator>
             <Stack.Screen 
                 name="Login"

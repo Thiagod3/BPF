@@ -14,6 +14,8 @@ const HeaderComp = () => {
 
     const handleMenu = () => {
         setShowMenu(!showMenu);
+        
+       
     }
 
     return (
@@ -38,7 +40,7 @@ const HeaderComp = () => {
 
                 </View>
             </View>
-            {showMenu && <MenuComp/>}
+            {showMenu && <MenuComp handleMenu={handleMenu}/>}
         </View>
     );
 }

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
 import Modal from "./layout/Modal";
+
+//Utils Criadas
+import renderImage from "../utils/renderImage";
 
 const MatchCardComp = ({
   id,
@@ -12,6 +14,7 @@ const MatchCardComp = ({
   paid,
   field,
   organizer,
+  price,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const matchId = id;
@@ -48,23 +51,10 @@ const MatchCardComp = ({
   return (
     <View style={styles.container}>
       <View style={styles.team}>
-        <Image source={{ uri: `${image}` }} style={styles.teamPic} />
-        <Text style={styles.teamName}>{name}</Text>
-      </View>
-
-      <View style={styles.infoContainer}>
-        {/* <View style={styles.info}>
-          <Text style={styles.infoText}>Campo: </Text>
-          <Text style={styles.infoText}>
-            {field === 0 ? "Areia" : field === 1 ? "Society" : "Gramado"}
-          </Text>
-        </View> */}
-        {/* <View style={styles.info}>
-          <Text style={styles.infoText}>Pago: </Text>
-          <Text style={styles.infoText}>
-            {paid === 0 ? "Sim" : "Não"}
-          </Text>
-        </View> */}
+        {(image && renderImage(image)) || (
+          <Image source={require("../../assets/BoraProFutOutline.png")} />
+        )}
+        <Text style={styles.teamName}>{organizer}</Text>
       </View>
 
       <View style={styles.address}>
@@ -72,8 +62,8 @@ const MatchCardComp = ({
         <Text style={styles.addressText}>{location}</Text>
       </View>
       <TouchableOpacity onPress={showMatch} style={styles.seeMore}>
-          <Text style={styles.seeMoreText}>Ver mais</Text>
-          <Ionicons name="chevron-forward" size={36} color="black" />
+        <Text style={styles.seeMoreText}>Ver mais</Text>
+        <Ionicons name="chevron-forward" size={36} color="black" />
       </TouchableOpacity>
 
       {/* Modal para mostrar detalhes da partida */}
@@ -85,6 +75,7 @@ const MatchCardComp = ({
         field={field}
         paid={paid}
         organizer={organizer}
+        price={price}
       />
     </View>
   );
@@ -139,13 +130,13 @@ const styles = StyleSheet.create({
   },
   seeMore: {
     marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     fontSize: 23,
   },
   seeMoreText: {
     fontSize: 23,
-  }
+  },
 });
 
 export default MatchCardComp;

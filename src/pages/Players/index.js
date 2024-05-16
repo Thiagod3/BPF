@@ -3,6 +3,7 @@ import HeaderComp from "../../components/HeaderComp.js";
 import PlayerCardComp from "../../components/PlayerCardComp";
 import { useState, useEffect, useCallback } from "react";
 
+
 import { useFocusEffect } from "@react-navigation/native";
 
 export default function Players() {
@@ -46,14 +47,15 @@ export default function Players() {
   return (
     <View style={styles.container}>
         {/* Adicionei Horizontal true para tirar um erro de VirtualList */}
-      <ScrollView horizontal={true} style={styles.PCard}>
-        <FlatList
+      <ScrollView horizontal={true} overScrollMode="never"  style={styles.PCard}>
+        <FlatList overScrollMode="never"
           data={users}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
       </ScrollView>
       <View>
+        
         <HeaderComp></HeaderComp>
       </View>
     </View>

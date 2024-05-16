@@ -13,6 +13,9 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import HeaderComp from "../../components/HeaderComp.js";
 import MatchCardComp from "../../components/MatchCardComp.js";
 
+//utils criadas
+import BackHandlerComponent from "../../utils/BackHandlerComponent.js";
+
 export default function Matches() {
   const [matchs, setMatchs] = useState([]);
   const [error, setError] = useState(null);
@@ -50,6 +53,7 @@ export default function Matches() {
       paid={item.paid} 
       organizer={item.TIME}
       image={item.image}
+      price={item.price}
     />
   );
 
@@ -57,8 +61,9 @@ export default function Matches() {
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal={true} style={styles.MCard}>
-        <FlatList
+      <BackHandlerComponent/>
+      <ScrollView horizontal={true} overScrollMode="never" style={styles.MCard}>
+        <FlatList overScrollMode="never"
           data={matchs}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}

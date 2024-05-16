@@ -13,9 +13,7 @@ const HeaderComp = () => {
     }
 
     const handleMenu = () => {
-        setShowMenu(!showMenu);
-        
-       
+        setShowMenu(!showMenu);      
     }
 
     return (

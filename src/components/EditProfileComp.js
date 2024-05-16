@@ -14,7 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const EditProfile = ({ onClose }) => {
+const EditProfile = ({  onClose, onEditPosition }) => {
 
 
   const pickImage = async () => {
@@ -101,7 +101,7 @@ const EditProfile = ({ onClose }) => {
             </Pressable>
           </View>,
           <View style={styles.buttonContainer}>
-            <Pressable style={styles.galleryButton}>
+            <Pressable onPress={onEditPosition} style={styles.galleryButton}>
               <FontAwesome name="soccer-ball-o" size={32} color="#FF731D" />
               <Text style={styles.buttonText}>Trocar posição</Text>
             </Pressable>

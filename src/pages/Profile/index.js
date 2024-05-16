@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,14 +13,11 @@ import {
 import Header from "../../components/HeaderComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button } from "@rneui/themed";
-import { useState, useEffect } from "react";
-import EditProfile from "../../components/EditProfileComp";
 import { useNavigation } from "@react-navigation/native";
-
-//Utils criadas
-import mapPositionToCode from "../../utils/mapPositionToCode";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EditProfile from "../../components/EditProfileComp";
+import EditPositionComp from "../../components/EditPositionComp";
+import mapPositionToCode from "../../utils/mapPositionToCode";
 import renderImage from "../../utils/renderImage";
 
 export default function Profile() {
@@ -27,26 +25,22 @@ export default function Profile() {
 
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [positionModalVisible, setPositionModalVisible] = useState(false);
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
 
-  
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Recupera o token e o ID do usuário do AsyncStorage
         const token = await AsyncStorage.getItem("token");
         const userId = await AsyncStorage.getItem("userId");
 
-        // Se não houver token, redireciona para a tela de login
         if (!token || !userId) {
           navigation.navigate("Login");
           return;
         }
 
-        // Faz uma solicitação ao servidor para obter os dados do usuário
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
           {
@@ -63,7 +57,6 @@ export default function Profile() {
         const userData = await response.json();
         setUser(userData);
 
-        // Após definir o usuário, busque os dados do time
         fetchUserTeam(userData.id);
       } catch (error) {
         console.error("Erro ao carregar dados do usuário:", error);
@@ -91,7 +84,7 @@ export default function Profile() {
     }
   };
 
-  const handleShowopt = () => {
+  const handleShowOpt = () => {
     setOpt(!opt);
   };
 
@@ -103,10 +96,10 @@ export default function Profile() {
         </View>
 
         {(team &&
-          team.length > 0 && ( // Verifica se team não é null e se tem pelo menos um elemento
+          team.length > 0 && (
             <View style={styles.info} id="team">
               <Text style={styles.infoText}>TIME</Text>
-              {team[0].image && ( // Verifica se team[0].image não é undefined
+              {team[0].image && (
                 <Image source={{ uri: team[0].image }} style={styles.teamPic} />
               )}
               <Text style={styles.infoText}>{team[0].name}</Text>
@@ -139,14 +132,14 @@ export default function Profile() {
           }
           containerStyle={styles.profileButton}
           onPress={() => {
-            handleShowopt();
+            handleShowOpt();
             setModalVisible(true);
           }}
         />
       </View>
 
       <View style={styles.header}>
-        <Header></Header>
+        <Header />
       </View>
 
       <Modal
@@ -162,7 +155,31 @@ export default function Profile() {
           style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
           onPress={() => setModalVisible(false)}
         ></TouchableOpacity>
-        <EditProfile onClose={() => setModalVisible(false)} />
+        <EditProfile
+          onClose={() => setModalVisible(false)}
+          onEditPosition={() => {
+            setModalVisible(false);
+            setPositionModalVisible(true);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={positionModalVisible}
+        onRequestClose={() => {
+          setPositionModalVisible(false);
+        }}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
+          onPress={() => setPositionModalVisible(false)}
+        ></TouchableOpacity>
+        <EditPositionComp 
+          onClose={() => setPositionModalVisible(false)} 
+        />
       </Modal>
     </View>
   );
@@ -174,7 +191,6 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    justifyContent: "flex-end",
     flexDirection: "column-reverse",
     backgroundColor: "#808080",
     gap: 15,
@@ -237,7 +253,4 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
-  editProfile: {
-    position: "absolute",
-  },
 });

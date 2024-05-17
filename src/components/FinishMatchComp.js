@@ -215,7 +215,6 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         paddingHorizontal: 30,
     },
-
     PCard: {
         display: "flex",
         alignSelf: "center",

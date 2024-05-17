@@ -4,13 +4,9 @@ import MenuComp from './MenuComp';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 
-const HeaderComp = () => {
+const HeaderComp = ({toggleSearch }) => {
 
     const [showMenu, setShowMenu] = useState(false);
-
-    const handleSearch = () => {
-        console.log('clicou lupa')
-    }
 
     const handleMenu = () => {
         setShowMenu(!showMenu);      
@@ -25,7 +21,7 @@ const HeaderComp = () => {
                 />
                 <View style={styles.menu}>
                     <TouchableOpacity
-                     onPress={handleSearch}
+                     onPress={toggleSearch}
                     >
                         <Ionicons name="search-outline" size={40} color="#FF731D"/>
                     </TouchableOpacity>

@@ -178,10 +178,10 @@ app.get("/api/users", (req, res) => {
 
 // Rota para inserir partidas no banco
 app.post("/api/matches/create", (req, res) => {
-  const { name, location, field, price, paid, date, time_organizador_id } = req.body;
+  const { city, location, field, price, paid, date, time_organizador_id, contact } = req.body;
   const sql =
-    "INSERT INTO matches (name, location, field, price, paid, date, time_organizador_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-  conn.query(sql, [name, location, field, price, paid, date, time_organizador_id], (err, result) => {
+    "INSERT INTO matches (city, location, field, price, paid, date, time_organizador_id, contact) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  conn.query(sql, [city, location, field, price, paid, date, time_organizador_id, contact], (err, result) => {
     if (err) {
       console.error("Erro ao inserir match no banco de dados:", err);
       res.status(500).json({ error: "Erro interno do servidor." });

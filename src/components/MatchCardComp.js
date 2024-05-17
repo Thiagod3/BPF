@@ -8,12 +8,13 @@ import renderImage from "../utils/renderImage";
 
 const MatchCardComp = ({
   id,
-  name,
+  organizer,
   image,
   location,
+  city,
+  contact,
   paid,
   field,
-  organizer,
   price,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,12 +55,12 @@ const MatchCardComp = ({
         {(image && renderImage(image)) || (
           <Image source={require("../../assets/BoraProFutOutline.png")} />
         )}
-        <Text style={styles.teamName}>{organizer}</Text>
+        <Text style={styles.teamName}>Jogo de {organizer}</Text>
       </View>
 
       <View style={styles.address}>
         <Ionicons name="location-outline" size={30} color="black" />
-        <Text style={styles.addressText}>{location}</Text>
+        <Text style={styles.addressText}>{location + " - " + city}</Text>
       </View>
       <TouchableOpacity onPress={showMatch} style={styles.seeMore}>
         <Text style={styles.seeMoreText}>Ver mais</Text>
@@ -76,6 +77,7 @@ const MatchCardComp = ({
         paid={paid}
         organizer={organizer}
         price={price}
+        contact={contact}
       />
     </View>
   );
@@ -94,6 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9D9D9",
   },
   teamName: {
+    textAlign:"center",
     paddingTop: 15,
     fontWeight: "bold",
     fontSize: 26,

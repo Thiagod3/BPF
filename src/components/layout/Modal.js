@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 
-const ExampleModal = ({ visible, onClose, organizer, location, paid, field, price }) => {
+const ExampleModal = ({ visible, onClose, organizer, location, paid, field, price, contact }) => {
   return (
     <Modal
       animationType="slide"
@@ -21,6 +21,8 @@ const ExampleModal = ({ visible, onClose, organizer, location, paid, field, pric
           <Text style={styles.modalText}>{paid == false || price == null ? "Não" : "Sim"}</Text>
           <Text style={styles.modalTitles}>Preço</Text>
           <Text style={styles.modalText}>{paid == false || price == null ? "Gratis" : "R$" + price }</Text>
+          <Text style={styles.modalTitles}>Forma de contato</Text>
+          <Text style={styles.modalText}>{contact}</Text>
           <TouchableOpacity
             onPress={onClose}
             style={styles.closeButton}

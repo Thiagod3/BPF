@@ -5,9 +5,11 @@ import {
   Text,
   ScrollView,
   FlatList,
+  TextInput,
 } from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { Button } from '@rneui/themed';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,8 +29,11 @@ export default function Matches() {
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
   const [hasMatch, setHasMatch] = useState(false);
+  const [search, setSearch] = useState(false);
+  const [filteredMatches, setFilteredMatches] = useState([]);
+  const [searchText, setSearchText] = useState('');
 
-  useFocusEffect(    
+  useFocusEffect(
     useCallback(() => {
       // Função para buscar Partidas da API
       const fetchMatchs = async () => {
@@ -38,7 +43,6 @@ export default function Matches() {
             throw new Error("Erro ao buscar partidas: " + response.statusText);
           }
           const data = await response.json();
-          //console.log("Dados recebidos:", data); // Log para verificar os dados recebidos
           setMatchs(data);
           isCreated();
         } catch (error) {
@@ -135,17 +139,34 @@ export default function Matches() {
     setHasMatch(isMatchFound);
   };
 
+  const filterMatches = (text) => {
+      const filtered = matchs.filter(match => match.city.toLowerCase().includes(text.toLowerCase()));
+      setFilteredMatches(filtered);
+  };
+
+  const handleKeyPress = (event) => {
+      if (event.nativeEvent.key === 'Enter') {
+          Keyboard.dismiss();
+          filterMatches(searchText);
+      }
+  };
+
+  const handleSearch = () => {
+    filterMatches(searchText);
+  };
+
   // Função para renderizar cada item da lista de usuários
   const renderItem = ({ item }) => (
     <MatchCardComp
       id={item.id}
-      name={item.name}
+      city={item.city}
       location={item.location}
       field={item.field}
       paid={item.paid}
       organizer={item.TIME}
       image={item.image}
       price={item.price}
+      contact={item.contact}
     />
   );
 
@@ -154,7 +175,7 @@ export default function Matches() {
       <BackHandlerComponent />
       <FlatList
         overScrollMode="never"
-        data={matchs}
+        data={filteredMatches}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         ListFooterComponent={<View style={styles.gapBottom} />}
@@ -163,9 +184,9 @@ export default function Matches() {
       {hasMatch ? (
         <TouchableOpacity
           style={styles.finishMatch}
-        onPress={() => {
-          navigation.navigate("FinishMatch");
-        }}
+          onPress={() => {
+            navigation.navigate("FinishMatch");
+          }}
         >
           <Ionicons name="add-outline" size={32} color="#FF731D" />
           <Text style={styles.matchText}>Começar a partida</Text>
@@ -184,10 +205,27 @@ export default function Matches() {
       )}
 
 
+      {search && <View style={styles.innerContainer}>
+        <Text style={styles.title}>Busque pela cidade</Text>
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Pesquisar pela cidade..."
+            style={styles.input}
+            value={searchText}
+            onChangeText={(text) => setSearchText(text)}
+            onKeyPress={handleKeyPress}
+          />
+          <Button radius={"sm"} type="clear" onPress={handleSearch}>
+            
+            <Ionicons name="search-sharp" size={30} color="black" />
+          </Button>
+        </View>
+      </View>}
+      
 
 
       <View style={styles.header}>
-        <HeaderComp />
+        <HeaderComp toggleSearch={() => setSearch(prevSearch => !prevSearch)}/>
       </View>
     </View>
   );
@@ -248,5 +286,29 @@ const styles = StyleSheet.create({
   },
   gapBottom: {
     height: 75,
-  }
+  },
+  innerContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      width: "90%",
+      backgroundColor: '#D9D9D9',
+      gap: 20,
+      padding: 20,
+      borderRadius: 10,
+      margin: 20,
+  },
+  title: {
+      fontSize: 24,
+      fontWeight: "bold"
+  },
+  inputBox: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: "#F2F2F2",
+      height: 50,
+      width: "90%",
+      borderRadius: 50,
+      paddingHorizontal: 30,
+  },
 });

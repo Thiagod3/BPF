@@ -44,6 +44,7 @@ export default function Matches() {
           }
           const data = await response.json();
           setMatchs(data);
+          setFilteredMatches(data);
           isCreated();
         } catch (error) {
           console.error(error);

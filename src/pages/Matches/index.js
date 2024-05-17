@@ -163,9 +163,9 @@ export default function Matches() {
       {hasMatch ? (
         <TouchableOpacity
           style={styles.finishMatch}
-        // onPress={() => {
-        //   navigation.navigate("CreateMatch");
-        // }}
+        onPress={() => {
+          navigation.navigate("FinishMatch");
+        }}
         >
           <Ionicons name="add-outline" size={32} color="#FF731D" />
           <Text style={styles.matchText}>Começar a partida</Text>

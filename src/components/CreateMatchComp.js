@@ -304,7 +304,10 @@ const CreateMatchComp = () => {
       <FAB
         title="criar partida!!"
         color="#113B8F"
-        onPress={insereDados}
+        onPress={() => {
+          insereDados();
+          navigation.navigate('Matches');
+        }}
         titleStyle={{ color: "#FF731D", fontWeight: "bold", fontSize: 20 }}
         upperCase
         icon={<Ionicons name="football-outline" size={30} color="#FF731D" />}

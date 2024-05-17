@@ -205,6 +205,20 @@ app.get("/api/matches/:id", (req, res) => {
   });
 });
 
+app.delete("/api/matches/delete/:id", (req, res) => {
+  const sql =
+    "DELETE FROM matches WHERE time_organizador_id = " + req.params.id;
+  conn.query(sql, (err, result) => {
+    if (err) {
+      console.error("Erro ao inserir match no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Match inserido com sucesso.");
+      res.status(201).json({ message: "Match criado com sucesso: " + result });
+    }
+  });
+});
+
 // Rota para buscar todos as partidas
 app.get("/api/matches", (req, res) => {
   //const query = 'SELECT * FROM Matches';

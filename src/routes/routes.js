@@ -6,6 +6,7 @@ const Stack = createNativeStackNavigator();
 
 import CreateAccount from '../pages/CreateAccount';
 import CreateMatch from "../pages/CreateMatch";
+import FinishMatch from "../pages/FinishMatch";
 import Login from '../pages/Login';
 import Matches from "../pages/Matches";
 import Players from "../pages/Players";
@@ -40,6 +41,12 @@ export default function Routes(){
             <Stack.Screen 
                 name="CreateMatch"
                 component={CreateMatch}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen 
+                name="FinishMatch"
+                component={FinishMatch}
                 options={{ headerShown: false }}
             />
 

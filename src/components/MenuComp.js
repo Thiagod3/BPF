@@ -15,7 +15,6 @@ const MenuComp = ({handleMenu}) => {
     }
 
     const handleLogOut = async() => {
-        console.log("entrou")
         Alert.alert('Sair', 'Você deseja deslogar?', [
             {
             text: 'Cancelar',

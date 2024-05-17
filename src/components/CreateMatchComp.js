@@ -8,15 +8,20 @@ import {
   TextInput,
   Pressable,
   Platform,
+  Alert 
 } from "react-native";
 import { CheckBox, FAB } from "@rneui/themed";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation,  } from "@react-navigation/native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateMatchComp = () => {
+  
+  const navigation = useNavigation();
+
   const [selectedField, setField] = React.useState(0);
   const [selectedPrice, setPrice] = React.useState(0);
   const [name, setName] = useState("");
@@ -24,7 +29,7 @@ const CreateMatchComp = () => {
   const [dateMatch, setDateMatch] = useState("");
   const [price, setPriceValue] = useState(0);
 
-  
+
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
 
@@ -93,17 +98,24 @@ const CreateMatchComp = () => {
         const teamId = teamData[0].id;
         setTeam(teamId); // Define apenas o valor do id
       } else {
-        throw new Error("Formato de dados inesperado");
+        throw new Error("Você precisa de um time para acessar essa função");
       }
     } catch (error) {
-      console.error("Erro na busca do time:", error);
+      Alert.alert(
+        "Crie um time!!",
+        error.message,
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.goBack();
+            }
+          }
+        ],
+        { cancelable: false }
+      );
     }
   };
-
-
-
-
-
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -264,16 +276,16 @@ const CreateMatchComp = () => {
           />
         </View>
         {selectedPrice === 1 && (
-            <View style={styles.inputBox}>
-              <TextInput
-                placeholder="Digite o preço"
-                style={styles.input}
-                value={price}
-                onChangeText={setPriceValue}
-                keyboardType="numeric"
-              />
-            </View>
-          )}
+          <View style={styles.inputBox}>
+            <TextInput
+              placeholder="Digite o preço"
+              style={styles.input}
+              value={price}
+              onChangeText={setPriceValue}
+              keyboardType="numeric"
+            />
+          </View>
+        )}
       </View>
 
       {showPicker && (

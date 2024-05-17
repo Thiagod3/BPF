@@ -18,12 +18,17 @@ import MatchCardComp from "../../components/MatchCardComp.js";
 import BackHandlerComponent from "../../utils/BackHandlerComponent.js";
 
 export default function Matches() {
+
+  const navigation = useNavigation();
+
+
   const [matchs, setMatchs] = useState([]);
   const [error, setError] = useState(null);
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
+  const [hasMatch, setHasMatch] = useState(false);
 
-  useFocusEffect(
+  useFocusEffect(    
     useCallback(() => {
       // Função para buscar Partidas da API
       const fetchMatchs = async () => {
@@ -35,6 +40,7 @@ export default function Matches() {
           const data = await response.json();
           //console.log("Dados recebidos:", data); // Log para verificar os dados recebidos
           setMatchs(data);
+          isCreated();
         } catch (error) {
           console.error(error);
           setError(
@@ -47,6 +53,10 @@ export default function Matches() {
       fetchMatchs();
     }, [])
   );
+
+  useEffect(() => {
+    isCreated();
+  }, [team, matchs]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -105,6 +115,26 @@ export default function Matches() {
     }
   };
 
+
+  const isCreated = () => {
+    if (!team[0] || typeof team[0].id === 'undefined') {
+      return false;
+    }
+
+    if (!Array.isArray(matchs)) {
+      return false;
+    }
+
+    const isMatchFound = matchs.some(match => {
+      if (typeof match.time_organizador_id === 'undefined') {
+        return false;
+      }
+
+      return Number(match.time_organizador_id) === Number(team[0].id);
+    });
+    setHasMatch(isMatchFound);
+  };
+
   // Função para renderizar cada item da lista de usuários
   const renderItem = ({ item }) => (
     <MatchCardComp
@@ -119,8 +149,6 @@ export default function Matches() {
     />
   );
 
-  const navigation = useNavigation();
-
   return (
     <View style={styles.container}>
       <BackHandlerComponent />
@@ -132,16 +160,7 @@ export default function Matches() {
         ListFooterComponent={<View style={styles.gapBottom} />}
       />
 
-
-        <TouchableOpacity
-          style={styles.createMatch}
-          onPress={() => {
-            navigation.navigate("CreateMatch");
-          }}
-        >
-          <Ionicons name="add-outline" size={32} color="#FF731D" />
-          <Text style={styles.matchText}>Criar uma partida</Text>
-        </TouchableOpacity>
+      {hasMatch ? (
         <TouchableOpacity
           style={styles.finishMatch}
         // onPress={() => {
@@ -151,6 +170,22 @@ export default function Matches() {
           <Ionicons name="add-outline" size={32} color="#FF731D" />
           <Text style={styles.matchText}>Começar a partida</Text>
         </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.createMatch}
+          onPress={() => {
+            isCreated();
+            navigation.navigate("CreateMatch");
+          }}
+        >
+          <Ionicons name="add-outline" size={32} color="#FF731D" />
+          <Text style={styles.matchText}>Criar uma partida</Text>
+        </TouchableOpacity>
+      )}
+
+
+
+
       <View style={styles.header}>
         <HeaderComp />
       </View>

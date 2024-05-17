@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,12 @@ import {
   Alert,
   ScrollView,
   Platform,
+  TextInput,
+  Pressable
 } from "react-native";
 import Header from "../../components/HeaderComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button } from "@rneui/themed";
+import { Button, ButtonGroup } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EditProfile from "../../components/EditProfileComp";
@@ -26,9 +28,13 @@ export default function Profile() {
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [positionModalVisible, setPositionModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef(null); 
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
+  const [bio, setBio] = useState("");
+  const [inputHeight, setInputHeight] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -84,13 +90,43 @@ export default function Profile() {
     }
   };
 
+  const handleUpdateBio = () => {
+    updateBio();  // Chame a função de atualização
+    inputRef.current.blur();  // Desfoque o TextInput
+  };
+
+  async function updateBio() {
+    const userData = {
+      id: user.id,
+      newBio: bio
+    }
+    console.log(userData)
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/${user.id}/${bio}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao enviar os dados para a API.');
+      }
+  
+      console.log('Dados enviados com sucesso para a API.');
+    } catch (error) {
+      console.error('Erro:', error.message);
+    }
+  }
+
   const handleShowOpt = () => {
     setOpt(!opt);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.infoContainer}>
+      <ScrollView style={styles.infoContainer} overScrollMode="never">
         <View style={styles.info} id="name">
           <Text style={styles.infoText}>{user.name}</Text>
         </View>
@@ -109,7 +145,30 @@ export default function Profile() {
             <Text style={styles.bio}>Não Possui um Time</Text>
           </View>
         )}
-        <Text style={styles.bio}>{user.description}</Text>
+
+      <Pressable style={styles.pressable}>
+        <TextInput
+        ref={inputRef}
+        placeholder={user.description}
+        style={styles.bio}
+        value={bio}
+        onChangeText={setBio}
+        multiline={true}
+        onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        />
+      </Pressable >
+      {isFocused ? (
+        <Button 
+          containerStyle={styles.button} 
+          color={"#FF731D"}
+          onPress={handleUpdateBio}
+        >
+          Atualizar bio
+        </Button>
+      ) : (
+        <Text style={styles.inputText}>Pressione para editar</Text>)}
       </ScrollView>
 
       <View style={styles.profile}>
@@ -198,6 +257,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     backgroundColor: "#D9D9D9",
     width: "90%",
+    height: "auto",
     borderRadius: 10,
     marginBottom: 20,
   },
@@ -212,7 +272,7 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 25,
-    color: "#808080",
+    color: "#333333",
     paddingHorizontal: 50,
     paddingVertical: 10,
   },
@@ -252,5 +312,21 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
   },
-
+  button:{
+    alignSelf:"center",
+    width: "60%",
+    borderRadius: 20,
+    marginTop:40,
+    marginBottom: 10
+  },
+  pressable:{
+    flexDirection: 'collumn',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  inputText:{
+    alignSelf:"center",
+    color:"#808080"
+  }
 });

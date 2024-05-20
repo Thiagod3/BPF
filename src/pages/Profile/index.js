@@ -165,8 +165,8 @@ export default function Profile() {
   }, [city, user.id]);
 
   const refreshPage = useCallback(() => {
-      navigation.navigate('Matches')
-      navigation.navigate('Profile', { key: Math.random().toString() });
+    navigation.navigate('Matches')
+    navigation.navigate('Profile', { key: Math.random().toString() });
   }, [navigation]);
 
   return (
@@ -185,10 +185,10 @@ export default function Profile() {
             <Text style={styles.infoText}>{team[0].name}</Text>
           </View>
         )) || (
-          <View style={styles.info} id="team">
-            <Text style={styles.bio}>Não Possui um Time</Text>
-          </View>
-        )}
+            <View style={styles.info} id="team">
+              <Text style={styles.bio}>Não Possui um Time</Text>
+            </View>
+          )}
 
 
         <View style={styles.infoCity} id="name">
@@ -210,36 +210,41 @@ export default function Profile() {
           />
         </View>
 
-        <Pressable style={styles.pressable}>
-          <TextInput
-            ref={inputRef}
-            placeholder={user.description}
-            style={styles.bio}
-            value={bio}
-            onChangeText={setBio}
-            multiline={true}
-            onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          />
-        </Pressable >
-        {isFocused ? (
-          <Button
-            containerStyle={styles.button}
-            color={"#FF731D"}
-            onPress={handleUpdateBio}
-          >
-            Atualizar bio
-          </Button>
-        ) : (
-          <Text style={styles.inputText}>Pressione para editar</Text>)}
+        <View style={styles.infoBio}>
+          <Pressable style={styles.pressable}>
+            <TextInput
+              ref={inputRef}
+              placeholder={user.description}
+              style={styles.bio}
+              value={bio}
+              onChangeText={setBio}
+              multiline={true}
+              onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
+          </Pressable >
+          {isFocused ? (
+            <Button
+              containerStyle={styles.button}
+              color={"#FF731D"}
+              onPress={handleUpdateBio}
+            >
+              Atualizar bio
+            </Button>
+          ) : (
+            <Text style={styles.inputText}>Pressione para editar</Text>)}
+
+        </View>
+
+
       </ScrollView>
 
       <View style={styles.profile}>
         <View style={styles.profile}>
-        {(user.image && renderImage(user.image)) || (
-              <Image source={require("../../../assets/profile-pic.png")} />
-            )}
+          {(user.image && renderImage(user.image)) || (
+            <Image source={require("../../../assets/profile-pic.png")} />
+          )}
           {user && (
             <Text style={styles.profileText}>
               {mapPositionToCode(user.position)}
@@ -344,6 +349,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     paddingVertical: 10,
+  },  
+  infoBio: {
+    alignItems: "center",
+    paddingVertical: 10,
   },
   infoCity: {
     flexDirection: "row",
@@ -403,31 +412,32 @@ const styles = StyleSheet.create({
   },
   button: {
     alignSelf: "center",
-  button: {
-    alignSelf: "center",
-    width: "60%",
-    borderRadius: 20,
-    marginTop: 40,
-    marginBottom: 10,
-  },
-  pressable: {
-    flexDirection: "collumn",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-  },
-  inputText: {
-    alignSelf: "center",
-    color: "#808080"
-  },
-  cityContainer: {
-    flex: 1,
-    backgroundColor: "rgba(1, 1, 1, 0.45)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modal: {
-    alignItems: "center",
-    justifyContent: "center",
+    button: {
+      alignSelf: "center",
+      width: "60%",
+      borderRadius: 20,
+      marginTop: 40,
+      marginBottom: 10,
+    },
+    pressable: {
+      flexDirection: "collumn",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 20,
+    },
+    inputText: {
+      alignSelf: "center",
+      color: "#808080"
+    },
+    cityContainer: {
+      flex: 1,
+      backgroundColor: "rgba(1, 1, 1, 0.45)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modal: {
+      alignItems: "center",
+      justifyContent: "center",
+    }
   }
-  }});
+});

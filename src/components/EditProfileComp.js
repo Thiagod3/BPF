@@ -9,13 +9,15 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { useState } from "react";
+import { useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-const EditProfile = ({  onClose, onEditPosition }) => {
+const EditProfile = ({ onClose, onEditPosition }) => {
+  const navigation = useNavigation();
 
 
   const pickImage = async () => {
@@ -32,7 +34,7 @@ const EditProfile = ({  onClose, onEditPosition }) => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [4, 4],
         quality: 0.5, // Adjust quality to reduce image size
         base64: false, // Do not request base64 data directly
       });
@@ -100,10 +102,19 @@ const EditProfile = ({  onClose, onEditPosition }) => {
       }
 
       Alert.alert('Success', 'Image uploaded successfully');
+      refreshPage();
+
     } catch (error) {
       Alert.alert('Error', `Failed to upload image: ${error.message}`);
     }
   };
+
+
+
+  const refreshPage = useCallback(() => {
+    navigation.navigate('Matches')
+    navigation.navigate('Profile', { key: Math.random().toString() });
+  }, [navigation]);
 
   return (
     <TouchableOpacity activeOpacity={1} style={styles.teste} onPress={onClose}>

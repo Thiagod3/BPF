@@ -7,7 +7,6 @@ const jwt = require("jsonwebtoken");
 
 // Criando uma instância do Express
 const app = express();
-const port = 5000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -238,6 +237,6 @@ app.get("/api/teams", (req, res) => {
 
 
 // Iniciando o servidor
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`Servidor rodando`);
 });

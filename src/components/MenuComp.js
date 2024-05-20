@@ -1,6 +1,9 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
+import { Alert } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MenuComp = ({handleMenu}) => {
 
@@ -11,6 +14,26 @@ const MenuComp = ({handleMenu}) => {
         handleMenu();
     }
 
+    const handleLogOut = async() => {
+        Alert.alert('Sair', 'Você deseja deslogar?', [
+            {
+            text: 'Cancelar',
+            onPress: () => null,
+            style: 'cancel',
+            },
+            {
+            text: 'Sim',
+            onPress: async () => {
+                await AsyncStorage.removeItem('token');
+                await AsyncStorage.removeItem('userId');
+                navigation.navigate('Login');
+            },
+            },
+        ]);
+
+    }
+
+    
 
     return (
         <View style={styles.container}>
@@ -33,6 +56,10 @@ const MenuComp = ({handleMenu}) => {
             <TouchableOpacity style={styles.button} onPress={() => handlePress("Rank")}>
                 <MaterialCommunityIcons name="trophy-award" size={40} color="#FF731D" />
                 <Text style={styles.buttonText}>Rank geral</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleLogOut}>
+            <MaterialCommunityIcons name="logout" size={40} color="#FF731D" />
+                <Text style={styles.buttonText}>Sair</Text>
             </TouchableOpacity>
             </View>
 )};

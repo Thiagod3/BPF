@@ -8,23 +8,29 @@ import {
   TextInput,
   Pressable,
   Platform,
+  Alert 
 } from "react-native";
 import { CheckBox, FAB } from "@rneui/themed";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation,  } from "@react-navigation/native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateMatchComp = () => {
+  
+  const navigation = useNavigation();
+
   const [selectedField, setField] = React.useState(0);
   const [selectedPrice, setPrice] = React.useState(0);
-  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
   const [location, setLocation] = useState("");
+  const [contact, setContact] = useState("");
   const [dateMatch, setDateMatch] = useState("");
   const [price, setPriceValue] = useState(0);
 
-  
+
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
 
@@ -93,17 +99,24 @@ const CreateMatchComp = () => {
         const teamId = teamData[0].id;
         setTeam(teamId); // Define apenas o valor do id
       } else {
-        throw new Error("Formato de dados inesperado");
+        throw new Error("Você precisa de um time para acessar essa função");
       }
     } catch (error) {
-      console.error("Erro na busca do time:", error);
+      Alert.alert(
+        "Crie um time!!",
+        error.message,
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.goBack();
+            }
+          }
+        ],
+        { cancelable: false }
+      );
     }
   };
-
-
-
-
-
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -136,13 +149,14 @@ const CreateMatchComp = () => {
   // objeto que recebe os dados
   async function insereDados() {
     const matchData = {
-      name: name,
+      city: city,
       location: location,
       field: selectedField,
       paid: selectedPrice,
       price: selectedPrice === 1 ? price : null,
       date: dateMatch,
       time_organizador_id: team,
+      contact: contact
     };
 
     setMatch(matchData)
@@ -175,21 +189,22 @@ const CreateMatchComp = () => {
 
       <View style={styles.inputBox}>
         <TextInput
-          placeholder="De um nome à partida"
-          name="location"
-          style={styles.input}
-          onChangeText={(text) => setName(text)}
-        />
-      </View>
-
-      <View style={styles.inputBox}>
-        <TextInput
           placeholder="Digite o endereço"
           name="location"
           style={styles.input}
           onChangeText={(text) => setLocation(text)}
         />
         <MaterialCommunityIcons name="map-marker" size={24} color="black" />
+      </View>
+
+      <View style={styles.inputBox}>
+        <TextInput
+          placeholder="Cidade"
+          name="city"
+          style={styles.input}
+          onChangeText={(text) => setCity(text)}
+        />
+        <MaterialCommunityIcons name="city-variant-outline" size={24} color="black" />
       </View>
 
       <Pressable onPress={toggleDatePicker} style={styles.inputBox}>
@@ -264,16 +279,28 @@ const CreateMatchComp = () => {
           />
         </View>
         {selectedPrice === 1 && (
-            <View style={styles.inputBox}>
-              <TextInput
-                placeholder="Digite o preço"
-                style={styles.input}
-                value={price}
-                onChangeText={setPriceValue}
-                keyboardType="numeric"
-              />
-            </View>
-          )}
+          <View style={styles.inputBox}>
+            <TextInput
+              placeholder="Digite o preço"
+              style={styles.input}
+              value={price}
+              onChangeText={setPriceValue}
+              keyboardType="numeric"
+            />
+          </View>
+        )}
+      </View>
+
+      
+      <Text style={styles.infoText}>Forma de contato: </Text>
+      <View style={styles.inputBox}>
+        <TextInput
+          placeholder="Ex: Instagram @SeuUser"
+          name="contact"
+          style={styles.input}
+          onChangeText={(text) => setContact(text)}
+        />
+        <MaterialCommunityIcons name="chat-processing-outline" size={24} color="black" />
       </View>
 
       {showPicker && (
@@ -292,7 +319,10 @@ const CreateMatchComp = () => {
       <FAB
         title="criar partida!!"
         color="#113B8F"
-        onPress={insereDados}
+        onPress={() => {
+          insereDados();
+          navigation.navigate('Matches');
+        }}
         titleStyle={{ color: "#FF731D", fontWeight: "bold", fontSize: 20 }}
         upperCase
         icon={<Ionicons name="football-outline" size={30} color="#FF731D" />}
@@ -357,7 +387,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: "100%",
-    width: "60%",
+    width: "100%",
   },
 });
 export default CreateMatchComp;

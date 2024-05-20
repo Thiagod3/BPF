@@ -175,12 +175,28 @@ app.get("/api/users", (req, res) => {
   });
 });
 
+app.put("/api/user/update/:id/:newBio", (req, res) => {
+  const id = req.params.id;
+  const newBio = req.params.newBio;
+
+  const sql = "UPDATE users SET description = ? WHERE id = ?";
+  conn.query(sql, [newBio, id], (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar a bio no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Bio atualizada com sucesso.");
+      res.status(200).json({ message: "Bio atualizada com sucesso: " + result });
+    }
+  });
+});
+
 // Rota para inserir partidas no banco
 app.post("/api/matches/create", (req, res) => {
-  const { name, location, field, price, paid, date, time_organizador_id } = req.body;
+  const { city, location, field, price, paid, date, time_organizador_id, contact } = req.body;
   const sql =
-    "INSERT INTO matches (name, location, field, price, paid, date, time_organizador_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-  conn.query(sql, [name, location, field, price, paid, date, time_organizador_id], (err, result) => {
+    "INSERT INTO matches (city, location, field, price, paid, date, time_organizador_id, contact) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  conn.query(sql, [city, location, field, price, paid, date, time_organizador_id, contact], (err, result) => {
     if (err) {
       console.error("Erro ao inserir match no banco de dados:", err);
       res.status(500).json({ error: "Erro interno do servidor." });
@@ -200,6 +216,20 @@ app.get("/api/matches/:id", (req, res) => {
       res.status(500).json({ error: "Erro interno do servidor" });
     } else {
       res.json(results);
+    }
+  });
+});
+
+app.delete("/api/matches/delete/:id", (req, res) => {
+  const sql =
+    "DELETE FROM matches WHERE time_organizador_id = " + req.params.id;
+  conn.query(sql, (err, result) => {
+    if (err) {
+      console.error("Erro ao inserir match no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Match inserido com sucesso.");
+      res.status(201).json({ message: "Match criado com sucesso: " + result });
     }
   });
 });

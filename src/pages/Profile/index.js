@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,18 +9,17 @@ import {
   Alert,
   ScrollView,
   Platform,
+  TextInput,
+  Pressable
 } from "react-native";
 import Header from "../../components/HeaderComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button } from "@rneui/themed";
-import { useState, useEffect } from "react";
-import EditProfile from "../../components/EditProfileComp";
+import { Button, ButtonGroup } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
-
-//Utils criadas
-import mapPositionToCode from "../../utils/mapPositionToCode";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EditProfile from "../../components/EditProfileComp";
+import EditPositionComp from "../../components/EditPositionComp";
+import mapPositionToCode from "../../utils/mapPositionToCode";
 import renderImage from "../../utils/renderImage";
 
 export default function Profile() {
@@ -27,26 +27,26 @@ export default function Profile() {
 
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [positionModalVisible, setPositionModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef(null); 
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
-
-  
+  const [bio, setBio] = useState("");
+  const [inputHeight, setInputHeight] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Recupera o token e o ID do usuário do AsyncStorage
         const token = await AsyncStorage.getItem("token");
         const userId = await AsyncStorage.getItem("userId");
 
-        // Se não houver token, redireciona para a tela de login
         if (!token || !userId) {
           navigation.navigate("Login");
           return;
         }
 
-        // Faz uma solicitação ao servidor para obter os dados do usuário
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
           {
@@ -63,7 +63,6 @@ export default function Profile() {
         const userData = await response.json();
         setUser(userData);
 
-        // Após definir o usuário, busque os dados do time
         fetchUserTeam(userData.id);
       } catch (error) {
         console.error("Erro ao carregar dados do usuário:", error);
@@ -91,22 +90,52 @@ export default function Profile() {
     }
   };
 
-  const handleShowopt = () => {
+  const handleUpdateBio = () => {
+    updateBio();  // Chame a função de atualização
+    inputRef.current.blur();  // Desfoque o TextInput
+  };
+
+  async function updateBio() {
+    const userData = {
+      id: user.id,
+      newBio: bio
+    }
+    console.log(userData)
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/${user.id}/${bio}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao enviar os dados para a API.');
+      }
+  
+      console.log('Dados enviados com sucesso para a API.');
+    } catch (error) {
+      console.error('Erro:', error.message);
+    }
+  }
+
+  const handleShowOpt = () => {
     setOpt(!opt);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.infoContainer}>
+      <ScrollView style={styles.infoContainer} overScrollMode="never">
         <View style={styles.info} id="name">
           <Text style={styles.infoText}>{user.name}</Text>
         </View>
 
         {(team &&
-          team.length > 0 && ( // Verifica se team não é null e se tem pelo menos um elemento
+          team.length > 0 && (
             <View style={styles.info} id="team">
               <Text style={styles.infoText}>TIME</Text>
-              {team[0].image && ( // Verifica se team[0].image não é undefined
+              {team[0].image && (
                 <Image source={{ uri: team[0].image }} style={styles.teamPic} />
               )}
               <Text style={styles.infoText}>{team[0].name}</Text>
@@ -116,7 +145,30 @@ export default function Profile() {
             <Text style={styles.bio}>Não Possui um Time</Text>
           </View>
         )}
-        <Text style={styles.bio}>{user.description}</Text>
+
+      <Pressable style={styles.pressable}>
+        <TextInput
+        ref={inputRef}
+        placeholder={user.description}
+        style={styles.bio}
+        value={bio}
+        onChangeText={setBio}
+        multiline={true}
+        onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        />
+      </Pressable >
+      {isFocused ? (
+        <Button 
+          containerStyle={styles.button} 
+          color={"#FF731D"}
+          onPress={handleUpdateBio}
+        >
+          Atualizar bio
+        </Button>
+      ) : (
+        <Text style={styles.inputText}>Pressione para editar</Text>)}
       </ScrollView>
 
       <View style={styles.profile}>
@@ -139,14 +191,14 @@ export default function Profile() {
           }
           containerStyle={styles.profileButton}
           onPress={() => {
-            handleShowopt();
+            handleShowOpt();
             setModalVisible(true);
           }}
         />
       </View>
 
       <View style={styles.header}>
-        <Header></Header>
+        <Header />
       </View>
 
       <Modal
@@ -162,7 +214,31 @@ export default function Profile() {
           style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
           onPress={() => setModalVisible(false)}
         ></TouchableOpacity>
-        <EditProfile onClose={() => setModalVisible(false)} />
+        <EditProfile
+          onClose={() => setModalVisible(false)}
+          onEditPosition={() => {
+            setModalVisible(false);
+            setPositionModalVisible(true);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={positionModalVisible}
+        onRequestClose={() => {
+          setPositionModalVisible(false);
+        }}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
+          onPress={() => setPositionModalVisible(false)}
+        ></TouchableOpacity>
+        <EditPositionComp 
+          onClose={() => setPositionModalVisible(false)} 
+        />
       </Modal>
     </View>
   );
@@ -174,7 +250,6 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    justifyContent: "flex-end",
     flexDirection: "column-reverse",
     backgroundColor: "#808080",
     gap: 15,
@@ -182,6 +257,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     backgroundColor: "#D9D9D9",
     width: "90%",
+    height: "auto",
     borderRadius: 10,
     marginBottom: 20,
   },
@@ -196,7 +272,7 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 25,
-    color: "#808080",
+    color: "#333333",
     paddingHorizontal: 50,
     paddingVertical: 10,
   },
@@ -236,8 +312,21 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
   },
-
-  editProfile: {
-    position: "absolute",
+  button:{
+    alignSelf:"center",
+    width: "60%",
+    borderRadius: 20,
+    marginTop:40,
+    marginBottom: 10
   },
+  pressable:{
+    flexDirection: 'collumn',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  inputText:{
+    alignSelf:"center",
+    color:"#808080"
+  }
 });

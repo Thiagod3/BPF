@@ -7,11 +7,11 @@ export default function CreateMatch(){
     return (
         
         <View style={styles.container}> 
-                <ScrollView>
-                    <CreateMatchComp></CreateMatchComp>
+                <ScrollView style={styles.body}>
+                    <CreateMatchComp/>
                 </ScrollView>
             <View style={styles.header}>
-                <HeaderComp></HeaderComp>
+                <HeaderComp/>
             </View>            
         </View>
         
@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column-reverse',
         alignItems: 'center',
-        justifyContent: 'flex-end',
         width: '100%',
         height: '100%',
         backgroundColor: '#808080',

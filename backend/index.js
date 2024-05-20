@@ -316,6 +316,19 @@ app.get("/api/teams", (req, res) => {
   });
 });
 
+app.get("/api/teamsNoUser/:id", (req, res) => {
+  console.log("tt" + req.params.teamId)
+    const sql = "SELECT * FROM teams WHERE id != " + req.params.id;
+    conn.query(query, (err, results) => {
+      if (err) {
+        console.error("Erro ao executar a consulta:", err.message);
+        res.status(500).json({ error: "Erro interno do servidor" });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
 app.get("/api/matches", (req, res) => {
   //const query = 'SELECT * FROM Matches';
   const query = `SELECT Matches.*, Teams.name as TIME,  Teams.image
@@ -332,6 +345,23 @@ app.get("/api/matches", (req, res) => {
     }
   });
 });
+
+app.put("/api/teams/incrementMatches/:userTeamId/:rivalTeamId", (req, res) => {
+
+  const sql = "UPDATE teams " +
+              "SET numberMatches = numberMatches + 1 " +
+              "WHERE id IN (" + req.params.userTeamId +", "+ req.params.rivalTeamId + ");";
+  conn.query(sql, (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar a Cidade no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Cidade atualizada com sucesso.");
+      res.status(200).json({ message: "Cidade atualizada com sucesso: " + result });
+    }
+  });
+});
+
 
 // Iniciando o servidor
 app.listen(process.env.PORT || 5000, () => {

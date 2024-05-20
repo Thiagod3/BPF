@@ -4,9 +4,11 @@ import { CheckBox } from '@rneui/themed';
 //utils criadas
 import renderImageCards from "../utils/renderImageCards";
 import mapPositionToCode from "../utils/mapPositionToCode";
+import { useState } from "react";
 
-const TeamCardComp = ({ name, image }) => {
+const TeamCardComp = ({ id, name, image, numberMatches, isSelected, onSelect }) => {
     
+const [check1, setCheck1] = useState(false);
 
   return (
     
@@ -17,7 +19,9 @@ const TeamCardComp = ({ name, image }) => {
       <Text style={styles.containerText}>{name}</Text>
       
       <CheckBox
-            containerStyle={styles.boxes}
+            containerStyle={styles.boxes}       
+            checked={isSelected}
+            onPress={onSelect}
             checkedIcon="dot-circle-o"
             size={20}
             uncheckedIcon="circle-o"

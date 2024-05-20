@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,19 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  Platform,
   TextInput,
   Pressable
 } from "react-native";
 import Header from "../../components/HeaderComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button, ButtonGroup } from "@rneui/themed";
+import { Ionicons } from "@expo/vector-icons";
+import { Button } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import EditProfile from "../../components/EditProfileComp";
 import EditPositionComp from "../../components/EditPositionComp";
+import EditCityComp from "../../components/EditCityComp";
 import mapPositionToCode from "../../utils/mapPositionToCode";
 import renderImage from "../../utils/renderImage";
 
@@ -28,12 +30,14 @@ export default function Profile() {
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [positionModalVisible, setPositionModalVisible] = useState(false);
+  const [cityModalVisible, setCityModalVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef(null); 
+  const inputRef = useRef(null);
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
   const [bio, setBio] = useState("");
+  const [city, setCity] = useState("");
   const [inputHeight, setInputHeight] = useState(0);
 
   useEffect(() => {
@@ -100,21 +104,21 @@ export default function Profile() {
       id: user.id,
       newBio: bio
     }
-    console.log(userData)
-    
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/${user.id}/${bio}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/bio/${user.id}/${bio}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error('Erro ao enviar os dados para a API.');
       }
-  
+
       console.log('Dados enviados com sucesso para a API.');
+      refreshPage();
     } catch (error) {
       console.error('Erro:', error.message);
     }
@@ -123,6 +127,47 @@ export default function Profile() {
   const handleShowOpt = () => {
     setOpt(!opt);
   };
+
+  async function updateCity() {
+    const userData = {
+      id: user.id,
+      newcity: city
+    }
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/city/${user.id}/${city}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao enviar os dados para a API.');
+      }
+
+      console.log('Dados enviados com sucesso para a API.');
+    } catch (error) {
+      console.error('Erro:', error.message);
+    }
+  }
+
+  const handleUpdateCity = (newCity) => {
+    setCity(newCity);
+  };
+
+  useEffect(() => {
+    if (city) {
+      updateCity(user.id, city);
+      refreshPage();
+
+    }
+  }, [city, user.id]);
+
+  const refreshPage = useCallback(() => {
+      navigation.navigate('Matches')
+      navigation.navigate('Profile', { key: Math.random().toString() });
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -141,34 +186,54 @@ export default function Profile() {
               <Text style={styles.infoText}>{team[0].name}</Text>
             </View>
           )) || (
-          <View style={styles.info} id="team">
-            <Text style={styles.bio}>Não Possui um Time</Text>
-          </View>
-        )}
+            <View style={styles.info} id="team">
+              <Text style={styles.bio}>Não Possui um Time</Text>
+            </View>
+          )}
 
-      <Pressable style={styles.pressable}>
-        <TextInput
-        ref={inputRef}
-        placeholder={user.description}
-        style={styles.bio}
-        value={bio}
-        onChangeText={setBio}
-        multiline={true}
-        onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        />
-      </Pressable >
-      {isFocused ? (
-        <Button 
-          containerStyle={styles.button} 
-          color={"#FF731D"}
-          onPress={handleUpdateBio}
-        >
-          Atualizar bio
-        </Button>
-      ) : (
-        <Text style={styles.inputText}>Pressione para editar</Text>)}
+
+        <View style={styles.infoCity} id="name">
+          <Ionicons name="location-outline" size={30} color="black" />
+          <Text style={styles.infoText}>{user.city}</Text>
+          <Button
+            color="#FF731D"
+            icon={
+              <MaterialCommunityIcons
+                name="progress-pencil"
+                size={30}
+                color="black"
+              />
+            }
+            containerStyle={styles.cityButton}
+            onPress={() => {
+              setCityModalVisible(true);
+            }}
+          />
+        </View>
+
+        <Pressable style={styles.pressable}>
+          <TextInput
+            ref={inputRef}
+            placeholder={user.description}
+            style={styles.bio}
+            value={bio}
+            onChangeText={setBio}
+            multiline={true}
+            onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
+        </Pressable >
+        {isFocused ? (
+          <Button
+            containerStyle={styles.button}
+            color={"#FF731D"}
+            onPress={handleUpdateBio}
+          >
+            Atualizar bio
+          </Button>
+        ) : (
+          <Text style={styles.inputText}>Pressione para editar</Text>)}
       </ScrollView>
 
       <View style={styles.profile}>
@@ -236,8 +301,23 @@ export default function Profile() {
           style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
           onPress={() => setPositionModalVisible(false)}
         ></TouchableOpacity>
-        <EditPositionComp 
-          onClose={() => setPositionModalVisible(false)} 
+        <EditPositionComp
+          onClose={() => setPositionModalVisible(false)}
+        />
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={cityModalVisible}
+        onRequestClose={() => {
+          setCityModalVisible(false);
+        }}
+        containerStyle={styles.modal}
+      >
+        <EditCityComp
+          onUpdateCity={handleUpdateCity}
+          onClose={() => setCityModalVisible(false)}
         />
       </Modal>
     </View>
@@ -263,6 +343,13 @@ const styles = StyleSheet.create({
   },
   info: {
     alignItems: "center",
+    borderBottomWidth: 1,
+    paddingVertical: 10,
+  },
+  infoCity: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
     borderBottomWidth: 1,
     paddingVertical: 10,
   },
@@ -309,24 +396,37 @@ const styles = StyleSheet.create({
     marginLeft: 150,
     borderRadius: 50,
   },
+  cityButton: {
+    borderRadius: 50,
+  },
   header: {
     width: "100%",
   },
-  button:{
-    alignSelf:"center",
+  button: {
+    alignSelf: "center",
     width: "60%",
     borderRadius: 20,
-    marginTop:40,
+    marginTop: 40,
     marginBottom: 10
   },
-  pressable:{
+  pressable: {
     flexDirection: 'collumn',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
   },
-  inputText:{
-    alignSelf:"center",
-    color:"#808080"
+  inputText: {
+    alignSelf: "center",
+    color: "#808080"
+  },
+  cityContainer: {
+    flex: 1,
+    backgroundColor: "rgba(1, 1, 1, 0.45)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modal: {
+    alignItems: "center",
+    justifyContent: "center",
   }
 });

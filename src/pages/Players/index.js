@@ -14,6 +14,8 @@ export default function Players() {
   const [search, setSearch] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchText, setSearchText] = useState('');
+  
+  const mostrarBotao = true;
 
   useFocusEffect(useCallback(() => {
     // Função para buscar usuários da API
@@ -93,7 +95,7 @@ export default function Players() {
         </View>
       </View>}
       <View>
-        <HeaderComp toggleSearch={() => setSearch(prevSearch => !prevSearch)} />
+        <HeaderComp mostrarBotao={mostrarBotao} toggleSearch={() => setSearch(prevSearch => !prevSearch)} />
       </View>
     </View>
   );

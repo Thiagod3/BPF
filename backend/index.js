@@ -96,13 +96,13 @@ app.post("/login", (req, res) => {
 
 // Rota para inserir usuarios no banco
 app.post("/api/users/create", async (req, res) => {
-  const { email, username, password, description, position } = req.body;
+  const { email, username, password, description, position, city } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const sql =
-    "INSERT INTO users ( email, name, password, description, position) VALUES (?, ?, ?, ?, ?)";
+    "INSERT INTO users ( email, name, password, description, position, city) VALUES (?, ?, ?, ?, ?, ?)";
   conn.query(
     sql,
-    [email, username, hashedPassword, description, position],
+    [email, username, hashedPassword, description, position, city],
     (err, result) => {
       if (err) {
         console.error("Erro ao inserir usuario no banco de dados:", err);
@@ -119,7 +119,7 @@ app.post("/api/users/create", async (req, res) => {
 
 function findUserById(userId) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT id, name, email, description, image, position FROM users WHERE id = ?";
+    const sql = "SELECT id, name, email, description, image, position, city FROM users WHERE id = ?";
     conn.query(sql, [userId], (error, results) => {
       if (error) {
         console.log("Erro FindById" + error)
@@ -176,7 +176,7 @@ app.get("/api/users", (req, res) => {
   });
 });
 
-app.put("/api/user/update/:id/:newBio", (req, res) => {
+app.put("/api/user/update/bio/:id/:newBio", (req, res) => {
   const id = req.params.id;
   const newBio = req.params.newBio;
 
@@ -188,6 +188,38 @@ app.put("/api/user/update/:id/:newBio", (req, res) => {
     } else {
       console.log("Bio atualizada com sucesso.");
       res.status(200).json({ message: "Bio atualizada com sucesso: " + result });
+    }
+  });
+});
+
+app.put("/api/user/update/city/:id/:newCity", (req, res) => {
+  const id = req.params.id;
+  const newCity = req.params.newCity;
+
+  const sql = "UPDATE users SET city = ? WHERE id = ?";
+  conn.query(sql, [newCity, id], (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar a Cidade no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Cidade atualizada com sucesso.");
+      res.status(200).json({ message: "Cidade atualizada com sucesso: " + result });
+    }
+  });
+});
+
+app.put("/api/user/update/position/:id/:position", (req, res) => {
+  const id = req.params.id;
+  const position = req.params.position;
+
+  const sql = "UPDATE users SET position = ? WHERE id = ?";
+  conn.query(sql, [position, id], (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar a Cidade no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Cidade atualizada com sucesso.");
+      res.status(200).json({ message: "Cidade atualizada com sucesso: " + result });
     }
   });
 });

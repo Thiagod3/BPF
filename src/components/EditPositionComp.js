@@ -1,19 +1,93 @@
 import {
-    Image, StyleSheet, Text, View, Dimensions, ImageBackground,
-    Pressable,
+    StyleSheet, Text, View, Dimensions,
 } from "react-native";
-import { Button } from "@rneui/themed";
-
-import { FontAwesome } from "@expo/vector-icons";
-
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from 'expo-file-system';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState, useCallback } from "react";
+import { Button, } from "@rneui/themed";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get('window');
 
 
-export default function EditPositionComp() {
+export default function EditPositionComp({onClose}) {
+    const navigation = useNavigation();
+
+    const [position, setPosition] = useState("");
+
+    const [user, setUser] = useState("");
+
+    const refreshPage = useCallback(() => {
+        navigation.navigate('Matches')
+        navigation.navigate('Profile', { key: Math.random().toString() });
+    }, [navigation]);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = await AsyncStorage.getItem("token");
+                const userId = await AsyncStorage.getItem("userId");
+
+                if (!token || !userId) {
+                    navigation.navigate("Login");
+                    return;
+                }
+
+                const response = await fetch(
+                    `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Erro ao carregar dados do usuário, Erro A");
+                }
+
+                const userData = await response.json();
+                setUser(userData);
+                
+            } catch (error) {
+                console.error("Erro ao carregar dados do usuário:", error);
+                Alert.alert("Erro", "Erro ao carregar dados do usuário");
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    async function updateCity() {
+        const userData = {
+            id: user.id,
+            newcity: position
+        }
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/position/${user.id}/${position}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao enviar os dados para a API.');
+            }
+
+            console.log('Dados enviados com sucesso para a API.');
+            refreshPage();
+            onClose();
+        } catch (error) {
+            console.error('Erro:', error.message);
+        }
+    }
+
+    useEffect(() => {
+        if (position) {
+            updateCity(user.id, position);
+        }
+    }, [position, user.id]);
 
 
     return (
@@ -48,42 +122,60 @@ export default function EditPositionComp() {
 
 
                     <View style={styles.button}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>ATA</Button>
+                        <Button
+                            containerStyle={styles.buttons}
+                            color={"#FF731D"}
+                            onPress={() => { setPosition("atacante") }}
+                        >ATA</Button>
                     </View>
 
                     <View style={styles.buttonRow}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>PE</Button>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>PD</Button>
+                        <Button
+                            containerStyle={styles.buttons}
+                            color={"#FF731D"}
+                            onPress={() => { setPosition("pontaEsquerda") }}
+                        >PE</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("pontaDireita") }}>PD</Button>
                     </View>
 
                     <View style={styles.button}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>SA</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("segundoAtacante") }}>SA</Button>
                     </View>
 
                     <View style={styles.button}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>MC</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("meioCampo") }}>MC</Button>
                     </View>
 
                     <View style={styles.buttonRow}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>ME</Button>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>MD</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("meiaEsquerda") }}>ME</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("meiaDireita") }}>MD</Button>
                     </View>
 
                     <View style={styles.button}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>VOL</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("volante") }}>VOL</Button>
                     </View>
 
                     <View style={styles.buttonRow}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>LE</Button>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>LD</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("lateralEsquerda") }}>LE</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("lateralDireita") }}>LD</Button>
                     </View>
 
                     <View style={styles.button}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>ZAG</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("zagueiro") }}>ZAG</Button>
                     </View>
 
                     <View style={styles.button}>
-                        <Button containerStyle={styles.buttons} color={"#FF731D"}>GOL</Button>
+                        <Button containerStyle={styles.buttons} color={"#FF731D"}
+                            onPress={() => { setPosition("goleiro") }}>GOL</Button>
                     </View>
                 </View>
             </View>
@@ -135,7 +227,7 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: "white",
         width: '100%',
-        height: '100%', 
+        height: '100%',
         backgroundColor: 'green',
         gap: 20,
         position: 'relative',
@@ -152,10 +244,10 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: '50%',
         left: '50%',
-        width: 100, 
-        height: 100, 
-        marginLeft: -50, 
-        marginTop: -50, 
+        width: 100,
+        height: 100,
+        marginLeft: -50,
+        marginTop: -50,
         borderRadius: 50,
         borderWidth: 2,
         borderColor: 'white',

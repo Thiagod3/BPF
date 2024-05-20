@@ -11,6 +11,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import EditTeamComp from "./EditTeamComp";
 
+import PlayerAddModal from "./PlayerAddModal";
+
 import renderImage from "../utils/renderImage";
 
 import { useState } from "react";
@@ -18,6 +20,7 @@ import { useState } from "react";
 export default function CreateTeamComp({ team }) {
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [PlayerAddVisibility, setPlayerAddVisibility] = useState(false);
 
   const handleShowopt = () => {
     setOpt(!opt);
@@ -65,7 +68,10 @@ export default function CreateTeamComp({ team }) {
         icon={<Ionicons name="eye-outline" size={30} color="#FF731D" />}
         containerStyle={styles.memberButton}
         titleStyle={styles.memberButtonTitle}
+        onPress={() => setPlayerAddVisibility(true)}
       />
+
+      <PlayerAddModal visible={PlayerAddVisibility} onClose={() => setPlayerAddVisibility(false)} />
 
       <Modal
         animationType="slide"

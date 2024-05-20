@@ -12,6 +12,46 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
+app.get('/api/user/team-by-admin/:user_admin_id', (req, res) => {
+  const { user_admin_id } = req.params;
+
+  const query = 'SELECT * FROM teams WHERE user_admin_id = ?';
+  conn.query(query, [user_admin_id], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar time:', err);
+      return res.status(500).send('Erro ao buscar time.');
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send('Time não encontrado.');
+    }
+
+    res.status(200).json(results[0]);
+  });
+});
+
+
+// Rota para inserir um novo jogador
+app.post('/api/user/add-player', (req, res) => {
+  const { user_id, team_id } = req.body;
+
+  console.log("Usuario: " + user_id + "Time: " +  team_id);
+
+  if (!user_id || !team_id) {
+    return res.status(400).send('Os campos user_id e team_id são obrigatórios.');
+  }
+
+  const query = 'INSERT INTO jogadores (usuario_id, time_id) VALUES (?, ?)';
+  conn.query(query, [user_id, team_id], (err, result) => {
+    if (err) {
+      console.error('Erro ao inserir jogador:', err);
+      return res.status(500).send('Erro ao inserir jogador.');
+    }
+    res.status(200).send('Jogador inserido com sucesso.');
+  });
+});
+
+
 // Rota para receber a imagem do usuario e atualizar o banco de dados
 app.post('/api/user/uploadImage', (req, res) => {
   const { image, userId } = req.body;

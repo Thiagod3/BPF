@@ -4,28 +4,28 @@ function mapPositionToCode(position) {
   switch (lowerCasePosition) {
     case "atacante":
       return "ATA";
-    case "centroavante":
-      return "ATA";
-    case "goleiro":
-      return "GOL";
-    case "zagueiro":
-      return "ZAG";
-    case "zagueiro Central":
-      return "ZGC";
-    case "lateral direito":
-      return "LTD";
-    case "lateral esquerdo":
-      return "LTE";
+    case "pontaesquerda":
+      return "PE";
+    case "pontadireita":
+      return "PD";
+    case "segundoatacante":
+      return "SA";
+    case "meiocampo":
+      return "MC";
+    case "meiaesquerda":
+      return "ME";
+    case "meiadireita":
+      return "MD";
     case "volante":
       return "VOL";
-    case "meio de campo":
-      return "MC";
-    case "meio de campo direito":
-      return "MCD";
-    case "meio de campo esquerdo":
-      return "MCE";
-    case "meio de campo ofensivo":
-      return "MCO";
+    case "lateralesquerda":
+      return "LE";
+    case "lateraldireita":
+      return "LD";
+    case "zagueiro":
+      return "ZAG";
+    case "goleiro":
+      return "GOL";
     default:
       return "ND";
   }

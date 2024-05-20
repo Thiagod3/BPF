@@ -19,7 +19,12 @@ export default function Routes(){
     return (
         <NavigationContainer>
 
-            <Stack.Navigator>
+            <Stack.Navigator
+                screenOptions={{
+                    headerShown: false,
+                    animation:"fade"
+                }}
+            >
             <Stack.Screen 
                 name="Login"
                 component={Login}

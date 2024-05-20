@@ -11,6 +11,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  Modal,
 } from "react-native";
 
 
@@ -22,9 +23,8 @@ export default function CreateAccount() {
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
   const [position, setPosition] = useState("");
-  const [description, setDescription] = useState("");
-
-  // const [user, setUser] = useState();
+  const [city, setCity] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleCreate = async () => {
     //Verifica se dados foram inseridos e são validos
@@ -44,6 +44,7 @@ export default function CreateAccount() {
       username: username,
       password: password,
       position: position,
+      city: city,
     };
 
     // setUser(userData);
@@ -63,7 +64,7 @@ export default function CreateAccount() {
       if (!response.ok) {
         Alert.alert("Ocorreu um erro no cadastro", "Tente novamente mais tarde")
         throw new Error("Erro ao enviar os dados para a API.");
-      }else {
+      } else {
         console.log("Dados enviados com sucesso para a API.");
         Alert.alert("Dados Cadastrados", "O usuário foi cadastrado com sucesso")
         navigation.navigate("Login")
@@ -75,21 +76,21 @@ export default function CreateAccount() {
 
   const [value, setValue] = useState(null);
 
-    const renderItem = item => {
-      return (
-        <View style={styles.item}>
-          <Text style={styles.textItem}>{item.label}</Text>
-          {item.value === value && (
-            <AntDesign
-              style={styles.icon}
-              color="#D9D9D9"
-              name="Safety"
-              size={20}
-            />
-          )}
-        </View>
-      );
-    };
+  const renderItem = item => {
+    return (
+      <View style={styles.item}>
+        <Text style={styles.textItem}>{item.label}</Text>
+        {item.value === value && (
+          <AntDesign
+            style={styles.icon}
+            color="#D9D9D9"
+            name="Safety"
+            size={20}
+          />
+        )}
+      </View>
+    );
+  };
 
   const data = [
     { label: 'Atacante', value: 'atacante' },
@@ -99,87 +100,121 @@ export default function CreateAccount() {
   ];
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Image source={require("../../../assets/BoraProFutLogo.png")} />
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nome de usuário"
-          value={username}
-          onChangeText={(text) => setUsername(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirmar senha"
-          secureTextEntry
-          value={confirmpassword}
-          onChangeText={(text) => setConfirmPassword(text)}
-        />       
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <Image source={require("../../../assets/BoraProFutLogo.png")} />
+      <TextInput
+        style={styles.input}
+        placeholder="E-mail"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Nome de usuário"
+        value={username}
+        onChangeText={(text) => setUsername(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        secureTextEntry
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirmar senha"
+        secureTextEntry
+        value={confirmpassword}
+        onChangeText={(text) => setConfirmPassword(text)}
+      />
 
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={data}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Selecione sua posição"
-          value={value}
-          onChange={item => {
-            setPosition(item.value);
-          }}
-          renderLeftIcon={() => (
-            <AntDesign style={styles.icon} color="#808080" name="Safety" size={20} />
-          )}
-          renderItem={renderItem}
-        />
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={data}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Selecione sua posição"
+        value={value}
+        onChange={item => {
+          setValue(item.value);
+          setPosition(item.value);
+        }}
+        renderLeftIcon={() => (
+          <AntDesign style={styles.icon} color="#808080" name="Safety" size={20} />
+        )}
+        renderItem={renderItem}
+      />
+      <TouchableOpacity
+        style={styles.loginButton}
+        title="register"
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.loginButtonText}>CADASTRAR</Text>
+      </TouchableOpacity>
 
-        {/* <TextInput
-          style={styles.inputDescription}
-          placeholder="Descrição do Usuário"
-          multiline={true}
-          numberOfLines={4}
-          value={description}
-          onChangeText={(text) => setDescription(text)}
-        /> */}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+        style={styles.modal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Confirmação de Cadastro</Text>
 
-        <TouchableOpacity
-          style={styles.loginButton}
-          title="register"
-          onPress={handleCreate}
-        >
-          <Text style={styles.loginButtonText}>CADASTRAR</Text>
-        </TouchableOpacity>
-      </View>
+            <Text style={styles.modalText}>Para melhor experiência, recomendamos informar sua cidade</Text>
+            <Text style={styles.modalTextInfo}>Essa informação poderá ser trocada a qualquer momento</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Cidade"
+              value={city}
+              onChangeText={(text) => setCity(text)}
+            />
+
+            <Text style={styles.modalText}>Deseja confirmar o cadastro?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm]}
+                onPress={() => {
+                  setModalVisible(false);
+                  handleCreate();
+                }}
+              >
+                <Text style={styles.modalButtonText}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    height: "auto",
     padding: 36,
-    gap: 16,
     backgroundColor: "#333333",
+  },
+  contentContainer: {
+    width: "100%",
+    height: "100%",
+    gap: 16,
+    justifyContent: "center",
+    alignItems: "center"
   },
   title: {
     fontSize: 24,
@@ -187,18 +222,6 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    width: "100%",
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: "#D9D9D9",
-    marginBottom: 16,
-    paddingLeft: 8,
-    fontSize: 18,
-  },
-  inputDescription: {
-    height: 100,
-    textAlign: "left",
     width: "100%",
     borderColor: "gray",
     borderWidth: 1,
@@ -224,8 +247,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
     textDecorationLine: "underline",
-  },  
-  
+  },
   dropdown: {
     width: "100%",
     height: 50,
@@ -259,6 +281,71 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    padding: 20,
+    borderRadius: 10,
+    width: "100%",
+    alignItems: "center",
+    margin: 10,
+    backgroundColor: "#D9D9D9",
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalTextInfo:{
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalInput:{
+    height: 40,
+    width: "100%",
+    alignSelf:"center",
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: "#D9D9D9",
+    marginBottom: 16,
+    paddingLeft: 8,
+    fontSize: 18,
+
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 10,
+    padding: 10,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalButtonCancel: {
+    backgroundColor: "#FF731D",
+  },
+  modalButtonConfirm: {
+    backgroundColor: "#113B8F",
+  },
+  modalButtonText: {
+    color: "white",
     fontSize: 16,
   },
 });

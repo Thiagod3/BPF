@@ -33,9 +33,10 @@ export default function Matches() {
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [searchText, setSearchText] = useState('');
 
+  const mostrarBotao = true;
+
   useFocusEffect(
     useCallback(() => {
-      // Função para buscar Partidas da API
       const fetchMatchs = async () => {
         try {
           const response = await fetch(`${process.env.REACT_APP_API_URL}/api/matches`);
@@ -43,8 +44,24 @@ export default function Matches() {
             throw new Error("Erro ao buscar partidas: " + response.statusText);
           }
           const data = await response.json();
-          setMatchs(data);
-          setFilteredMatches(data);
+          
+          // Ordenar partidas conforme o `city` do usuário
+          const sortedMatches = data.sort((a, b) => {
+            const userCity = user.city ? user.city.toLowerCase() : "";
+            const cityA = a.city.toLowerCase();
+            const cityB = b.city.toLowerCase();
+
+            if (cityA === userCity && cityB !== userCity) {
+              return -1;
+            }
+            if (cityA !== userCity && cityB === userCity) {
+              return 1;
+            }
+            return 0;
+          });
+
+          setMatchs(sortedMatches);
+          setFilteredMatches(sortedMatches);
           isCreated();
         } catch (error) {
           console.error(error);
@@ -54,9 +71,8 @@ export default function Matches() {
         }
       };
 
-      // Chamando a função para buscar Partidas
       fetchMatchs();
-    }, [])
+    }, [user.city])
   );
 
   useEffect(() => {
@@ -226,7 +242,7 @@ export default function Matches() {
 
 
       <View style={styles.header}>
-        <HeaderComp toggleSearch={() => setSearch(prevSearch => !prevSearch)}/>
+        <HeaderComp mostrarBotao={mostrarBotao} toggleSearch={() => setSearch(prevSearch => !prevSearch)}/>
       </View>
     </View>
   );

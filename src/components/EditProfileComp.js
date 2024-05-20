@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -21,30 +22,54 @@ const EditProfile = ({  onClose, onEditPosition }) => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to make this work.');
+        Alert.alert(
+          'Permission Denied',
+          'Sorry, we need camera roll permissions to make this work.'
+        );
         return;
       }
-      
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
-        base64: true // Request base64 data
+        quality: 0.5, // Adjust quality to reduce image size
+        base64: false, // Do not request base64 data directly
       });
 
       if (!result.canceled) {
-        const base64 = await convertToBase64(result.assets[0].uri);
-        uploadImage(base64);
+        const resizedUri = await resizeImage(result.assets[0].uri);
+        const base64 = await convertToBase64(resizedUri);
+        if (base64) {
+          uploadImage(base64);
+        } else {
+          Alert.alert('Error', 'Failed to convert image to base64.');
+        }
       }
     } catch (error) {
       console.error('Error picking image:', error);
     }
   };
 
+  const resizeImage = async (uri) => {
+    try {
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 800, height: 800 } }],
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      return manipulatedImage.uri;
+    } catch (error) {
+      console.error('Error resizing image:', error);
+      return uri; // Return original URI if resizing fails
+    }
+  };
+
   const convertToBase64 = async (uri) => {
     try {
-      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
       return base64;
     } catch (error) {
       console.error('Error converting image to base64:', error);
@@ -54,12 +79,8 @@ const EditProfile = ({  onClose, onEditPosition }) => {
 
   const uploadImage = async (base64Image) => {
     try {
-      // URL da sua API
       const apiUrl = `${process.env.REACT_APP_API_URL}/api/user/uploadImage`;
-
-      const userId = await AsyncStorage.getItem("userId");
-
-      // Dados que você deseja enviar para o servidor (neste caso, apenas a imagem)
+      const userId = await AsyncStorage.getItem('userId');
       const data = {
         image: base64Image,
         userId: userId,
@@ -74,15 +95,15 @@ const EditProfile = ({  onClose, onEditPosition }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Erro na requisição de atualizar imagem');
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
       }
 
-      // Exibe uma mensagem de sucesso se a imagem for enviada com sucesso
-      Alert.alert('Sucesso', 'Imagem atualizada com sucesso');
+      Alert.alert('Success', 'Image uploaded successfully');
     } catch (error) {
-      Alert.alert('Erro', 'Falha no envio da imagem');
+      Alert.alert('Error', `Failed to upload image: ${error.message}`);
     }
-};
+  };
 
   return (
     <TouchableOpacity activeOpacity={1} style={styles.teste} onPress={onClose}>

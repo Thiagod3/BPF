@@ -1,61 +1,154 @@
 import { ButtonGroup } from "@rneui/themed";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
-import { View } from "react-native"
+import { StyleSheet, Text, TouchableOpacity, Pressable, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { View } from "react-native";
 
+import * as ImagePicker from "expo-image-picker";
+//import ImageResizer from 'react-native-image-resizer';
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const EditProfile = ({ onClose }) => {
+const EditTeam = ({ onClose }) => {
+  const pickImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Denied',
+          'Sorry, we need camera roll permissions to make this work.'
+        );
+        return;
+      }
 
-    return(
-        <TouchableOpacity
-            activeOpacity={1}
-            style={styles.teste}
-            onPress={onClose}
-        >
-                <ButtonGroup
-                    buttons={[
-                        <View style={styles.buttonContainer}>
-                            <FontAwesome name="camera" size={30} color="#FF731D" />
-                            <Text style={styles.buttonText}>Câmera</Text>
-                        </View>,
-                        <View style={styles.buttonContainer}>
-                             <FontAwesome name="photo" size={30} color="#FF731D" />
-                            <Text style={styles.buttonText}>Galeria</Text>
-                        </View>,
-                    ]}
-                    containerStyle={styles.buttons}
-                />
-        </TouchableOpacity>
-        
-    );
-}
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.5, // Adjust quality to reduce image size
+        base64: false, // Do not request base64 data directly
+      });
+
+      if (!result.canceled) {
+        const resizedUri = await resizeImage(result.assets[0].uri);
+        const base64 = await convertToBase64(resizedUri);
+        if (base64) {
+          uploadImage(base64);
+        } else {
+          Alert.alert('Error', 'Failed to convert image to base64.');
+        }
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+    }
+  };
+
+  const resizeImage = async (uri) => {
+    try {
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 800, height: 800 } }],
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      return manipulatedImage.uri;
+    } catch (error) {
+      console.error('Error resizing image:', error);
+      return uri; // Return original URI if resizing fails
+    }
+  };
+
+  const convertToBase64 = async (uri) => {
+    try {
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      return base64;
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      return null;
+    }
+  };
+
+  const uploadImage = async (base64Image) => {
+    try {
+      const apiUrl = `${process.env.REACT_APP_API_URL}/api/team/uploadImage`;
+      const userId = await AsyncStorage.getItem('userId');
+      const data = {
+        image: base64Image,
+        userId: userId,
+      };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
+      }
+
+      Alert.alert('Success', 'Image uploaded successfully');
+    } catch (error) {
+      Alert.alert('Error', `Failed to upload image: ${error.message}`);
+    }
+  };
+
+  return (
+    <TouchableOpacity activeOpacity={1} style={styles.teste} onPress={onClose}>
+      <ButtonGroup
+        buttons={[
+          <View style={styles.buttonContainer}>
+            <FontAwesome name="camera" size={30} color="#FF731D" />
+            <Text style={styles.buttonText}>Câmera</Text>
+          </View>,
+          <View style={styles.buttonContainer}>
+            <Pressable onPress={pickImage} style={styles.galleryButton}>
+              <FontAwesome name="photo" size={32} color="#FF731D" />
+              <Text style={styles.buttonText}>Galeria</Text>
+            </Pressable>
+          </View>,
+        ]}
+        containerStyle={styles.buttons}
+      />
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
-    teste: {
-        flexDirection: 'column-reverse',
-        height: '100%',
-        width: '100%',
-        alignItems: 'center',
-        position: 'absolute'
-    },
-    buttons:{
-        height: '15%',
-        width: '100%',
-        marginBottom: -3,
-        borderTopLeftRadius: 25,
-        borderTopRightRadius: 25,
-        backgroundColor:'#113B8F',
-        borderColor: 'transparent',
-    },
-    buttonContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color: "#FF731D",
-        marginTop: 5,
-    },
-})
+  teste: {
+    flexDirection: "column-reverse",
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    position: "absolute",
+  },
+  buttons: {
+    height: "15%",
+    width: "100%",
+    marginBottom: -3,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    backgroundColor: "#113B8F",
+    borderColor: "transparent",
+  },
+  buttonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "#FF731D",
+    marginTop: 5,
+  },
+  galleryButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  }
+});
 
-export default EditProfile;
+export default EditTeam;

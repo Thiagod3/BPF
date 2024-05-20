@@ -12,14 +12,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-// Rota para receber a imagem e atualizar o banco de dados
+// Rota para receber a imagem do usuario e atualizar o banco de dados
 app.post('/api/user/uploadImage', (req, res) => {
   const { image, userId } = req.body;
 
-  // Insira o código para atualizar o banco de dados com a imagem aqui
-  // Por exemplo, você pode executar uma consulta SQL de atualização
-
-  // Exemplo de consulta de atualização
   const sql = `UPDATE Users SET image = ? WHERE id = ?`;
 
   conn.query(sql, [image, userId], (err, result) => {
@@ -28,11 +24,50 @@ app.post('/api/user/uploadImage', (req, res) => {
       res.status(500).send('Erro ao atualizar o banco de dados');
       return;
     }
-    console.log('Imagem atualizada no banco de dados:', result);
-    res.status(200).send('Imagem atualizada com sucesso');
+    console.log('Imagem do usuario atualizada no banco de dados:', result);
+    res.status(200).send('Imagem do usuario atualizada com sucesso');
   });
 });
 
+
+// Rota para receber a imagem do time e atualizar o banco de dados
+app.post('/api/team/uploadImage', (req, res) => {
+  const { image, userId } = req.body;
+
+  const sql = `UPDATE Teams SET image = ? WHERE user_admin_id = ?`;
+
+  conn.query(sql, [image, userId], (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar o banco de dados:', err);
+      res.status(500).send('Erro ao atualizar o banco de dados');
+      return;
+    }
+    console.log('Imagem do time atualizada no banco de dados:', result);
+    res.status(200).send('Imagem do time atualizada com sucesso');
+  });
+});
+
+
+app.post('/api/team/create', (req, res) => {
+  const { newName, newBio, numberOfPlayers, newImage, numberOfMatches, userId} = req.body;
+  console.log(req.body)
+  const sql = "INSERT INTO teams (name, description, numberPlayers, numberMatches, user_admin_id) VALUES (?, ?, ?, ?, ?);"
+
+  conn.query(sql, [
+    newName,
+    newBio,
+    numberOfPlayers,
+    numberOfMatches,
+    userId
+  ], (err, results) => {
+    if(err) {
+      console.error("Erro ao inserir o time no banco de dados: ", err);
+      return res.status(500).json({error: "Erro ao inserir o time no banco de dados"})
+    }
+
+    return res.status(200).json(results);
+  })
+})
 
 //Consultar time do usuario
 app.get('/api/user/team/:id', (req, res) => {
@@ -235,6 +270,20 @@ app.delete("/api/matches/delete/:id", (req, res) => {
 });
 
 // Rota para buscar todos as partidas
+
+// Rota para buscar todos os times
+app.get("/api/teams", (req, res) => {
+  const query = "SELECT * FROM Teams";
+  conn.query(query, (err, results) => {
+    if (err) {
+      console.error("Erro ao executar a consulta:", err.message);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 app.get("/api/matches", (req, res) => {
   //const query = 'SELECT * FROM Matches';
   const query = `SELECT Matches.*, Teams.name as TIME,  Teams.image
@@ -251,20 +300,6 @@ app.get("/api/matches", (req, res) => {
     }
   });
 });
-
-// Rota para buscar todos os times
-app.get("/api/teams", (req, res) => {
-  const query = "SELECT * FROM Teams";
-  conn.query(query, (err, results) => {
-    if (err) {
-      console.error("Erro ao executar a consulta:", err.message);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
 
 // Iniciando o servidor
 app.listen(process.env.PORT || 5000, () => {

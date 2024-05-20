@@ -8,23 +8,70 @@ import {
   ScrollView,
 } from "react-native";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Button, Input, FAB } from "@rneui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
 import EditTeamComp from "./EditTeamComp";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CreateNewTeam() {
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const navigation = useNavigation();
+
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  // const [image, setImage] = useState("");
+
   const handleShowopt = () => {
     setOpt(!opt);
   };
 
+  const handleSubmit = async () => {
+
+    const userId = await AsyncStorage.getItem('userId');
+
+    const newTeamData = {
+      newName: name,
+      newBio: bio,
+      numberOfPlayers: 1,
+      // newImage: "",
+      numberOfMatches: 0,
+      userId
+    };
+
+    console.log("Dados do novo time: " + newTeamData);
+
+    try {
+        
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/team/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newTeamData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao enviar dados do novo time para a API.");
+      }
+
+      console.log("Time novo enviado com sucesso para a API.");
+      navigation.navigate('Team')
+    } catch (error) {
+      console.error("Erro:", error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.teamLogoContainer}>
+      {/* <View style={styles.teamLogoContainer}>
         <Image
           style={styles.teamLogo}
           source={require("../../assets/BoraProFutOutline.png")}
@@ -44,7 +91,7 @@ export default function CreateNewTeam() {
             setModalVisible(true);
           }}
         />
-      </View>
+      </View> */}
 
       <View style={styles.formContainer}>
         <View style={styles.inputName}>
@@ -59,6 +106,7 @@ export default function CreateNewTeam() {
             placeholder="Nome"
             textAlign="center"
             inputContainerStyle={{ borderBottomWidth: 0 }}
+            onChangeText={newText => setName(newText)}
           />
         </View>
         <View style={styles.inputBio}>
@@ -73,6 +121,7 @@ export default function CreateNewTeam() {
             placeholder="Bio..."
             inputContainerStyle={{ borderBottomWidth: 0, paddingVertical: 20 }}
             rightIconContainerStyle={{ marginBottom: -80 }}
+            onChangeText={newText => setBio(newText)}
           />
         </View>
       </View>
@@ -86,13 +135,11 @@ export default function CreateNewTeam() {
           icon={
             <Ionicons name="add-circle-outline" size={30} color="#FF731D" />
           }
-          onPress={() => {
-            console.log("Levar à team e mudar pra created");
-          }}
+          onPress={handleSubmit}
         />
       </View>
 
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -106,7 +153,7 @@ export default function CreateNewTeam() {
           onPress={() => setModalVisible(false)}
         ></TouchableOpacity>
         <EditTeamComp onClose={() => setModalVisible(false)} />
-      </Modal>
+      </Modal> */}
     </View>
   );
 }

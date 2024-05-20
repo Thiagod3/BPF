@@ -10,7 +10,7 @@ import {
   ScrollView,
   Platform,
   TextInput,
-  Pressable
+  Pressable,
 } from "react-native";
 import Header from "../../components/HeaderComp";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -29,7 +29,7 @@ export default function Profile() {
   const [modalVisible, setModalVisible] = useState(false);
   const [positionModalVisible, setPositionModalVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef(null); 
+  const inputRef = useRef(null);
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
@@ -73,6 +73,39 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
+  const handleUpdateBio = () => {
+    updateBio(); // Chame a função de atualização
+    inputRef.current.blur(); // Desfoque o TextInput
+  };
+
+  async function updateBio() {
+    const userData = {
+      id: user.id,
+      newBio: bio,
+    }
+    // console.log(userData);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/update/${user.id}/${bio}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao enviar os dados para a API.");
+      }
+
+      console.log("Dados enviados com sucesso para a API.");
+    } catch (error) {
+      console.error("Erro:", error.message);
+    }
+  }
+
   const fetchUserTeam = async (userId) => {
     try {
       const response = await fetch(
@@ -90,35 +123,7 @@ export default function Profile() {
     }
   };
 
-  const handleUpdateBio = () => {
-    updateBio();  // Chame a função de atualização
-    inputRef.current.blur();  // Desfoque o TextInput
-  };
-
-  async function updateBio() {
-    const userData = {
-      id: user.id,
-      newBio: bio
-    }
-    console.log(userData)
-    
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/${user.id}/${bio}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
   
-      if (!response.ok) {
-        throw new Error('Erro ao enviar os dados para a API.');
-      }
-  
-      console.log('Dados enviados com sucesso para a API.');
-    } catch (error) {
-      console.error('Erro:', error.message);
-    }
-  }
 
   const handleShowOpt = () => {
     setOpt(!opt);
@@ -131,49 +136,53 @@ export default function Profile() {
           <Text style={styles.infoText}>{user.name}</Text>
         </View>
 
-        {(team &&
-          team.length > 0 && (
-            <View style={styles.info} id="team">
-              <Text style={styles.infoText}>TIME</Text>
-              {team[0].image && (
-                <Image source={{ uri: team[0].image }} style={styles.teamPic} />
-              )}
-              <Text style={styles.infoText}>{team[0].name}</Text>
-            </View>
-          )) || (
+        {(team && team.length > 0 && (
+          <View style={styles.info} id="team">
+            <Text style={styles.infoText}>TIME</Text>
+            {(team[0].image && renderImage(team[0].image)) || (
+              <Image source={require("../../../assets/BoraProFutOutline.png")} />
+            )}
+            <Text style={styles.infoText}>{team[0].name}</Text>
+          </View>
+        )) || (
           <View style={styles.info} id="team">
             <Text style={styles.bio}>Não Possui um Time</Text>
           </View>
         )}
 
-      <Pressable style={styles.pressable}>
-        <TextInput
-        ref={inputRef}
-        placeholder={user.description}
-        style={styles.bio}
-        value={bio}
-        onChangeText={setBio}
-        multiline={true}
-        onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        />
-      </Pressable >
-      {isFocused ? (
-        <Button 
-          containerStyle={styles.button} 
-          color={"#FF731D"}
-          onPress={handleUpdateBio}
-        >
-          Atualizar bio
-        </Button>
-      ) : (
-        <Text style={styles.inputText}>Pressione para editar</Text>)}
+        <Pressable style={styles.pressable}>
+          <TextInput
+            ref={inputRef}
+            placeholder={user.description}
+            style={styles.bio}
+            value={bio}
+            onChangeText={setBio}
+            multiline={true}
+            onContentSizeChange={(event) =>
+              setInputHeight(event.nativeEvent.contentSize.height)
+            }
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
+        </Pressable>
+        {isFocused ? (
+          <Button
+            containerStyle={styles.button}
+            color={"#FF731D"}
+            onPress={handleUpdateBio}
+          >
+            Atualizar bio
+          </Button>
+        ) : (
+          <Text style={styles.inputText}>Pressione para editar</Text>
+        )}
       </ScrollView>
 
       <View style={styles.profile}>
         <View style={styles.profile}>
-          {renderImage(user.image)}
+        {(user.image && renderImage(user.image)) || (
+              <Image source={require("../../../assets/profile-pic.png")} />
+            )}
           {user && (
             <Text style={styles.profileText}>
               {mapPositionToCode(user.position)}
@@ -236,9 +245,7 @@ export default function Profile() {
           style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.45)" }}
           onPress={() => setPositionModalVisible(false)}
         ></TouchableOpacity>
-        <EditPositionComp 
-          onClose={() => setPositionModalVisible(false)} 
-        />
+        <EditPositionComp onClose={() => setPositionModalVisible(false)} />
       </Modal>
     </View>
   );
@@ -312,21 +319,21 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
   },
-  button:{
-    alignSelf:"center",
+  button: {
+    alignSelf: "center",
     width: "60%",
     borderRadius: 20,
-    marginTop:40,
-    marginBottom: 10
+    marginTop: 40,
+    marginBottom: 10,
   },
-  pressable:{
-    flexDirection: 'collumn',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  pressable: {
+    flexDirection: "collumn",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
   },
-  inputText:{
-    alignSelf:"center",
-    color:"#808080"
-  }
+  inputText: {
+    alignSelf: "center",
+    color: "#808080",
+  },
 });

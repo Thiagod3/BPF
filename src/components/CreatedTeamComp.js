@@ -11,7 +11,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import EditTeamComp from "./EditTeamComp";
 
-import PlayerAddModal from "./PlayerAddModal";
+import TeamPlayersModal from "./TeamPlayersModal";
 
 import renderImage from "../utils/renderImage";
 
@@ -71,7 +71,7 @@ export default function CreateTeamComp({ team }) {
         onPress={() => setPlayerAddVisibility(true)}
       />
 
-      <PlayerAddModal visible={PlayerAddVisibility} onClose={() => setPlayerAddVisibility(false)} />
+      <TeamPlayersModal team={team}  visible={PlayerAddVisibility} onClose={() => setPlayerAddVisibility(false)} />
 
       <Modal
         animationType="slide"

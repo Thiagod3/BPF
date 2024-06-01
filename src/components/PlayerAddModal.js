@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Modal,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Alert,
@@ -11,25 +10,22 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const PlayerAddModal = ({ visible, onClose, id, name, position, description }) => {
-  const [userId, setUserId] = useState("");
+const PlayerAddModal = ({
+  visible,
+  onClose,
+  id,
+  name,
+  position,
+  description,
+}) => {
   const [teamId, setTeamId] = useState("");
+  const [playerId, setPlayerId] = useState(null);
 
-  const [team, setTeam] = useState(null);
-
-  // const handleModalClose = (data) => {
-  //   setModalVisible(false);
-  //   setUserInfo(data);
-  // };
-
-  const invitePlayer = async () => {
-
-    console.log(id)
+  const fetchTeamId = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
 
       if (userId) {
-        // setUserId(userId);
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/api/user/team-by-admin/${userId}`
         );
@@ -42,7 +38,6 @@ const PlayerAddModal = ({ visible, onClose, id, name, position, description }) =
         const teamData = await response.json();
         if (teamData) {
           setTeamId(teamData.id);
-          // setTeam(teamData);
         } else {
           Alert.alert("Erro", "Time não encontrado para o usuário logado.");
         }
@@ -51,68 +46,84 @@ const PlayerAddModal = ({ visible, onClose, id, name, position, description }) =
       console.error("Erro ao buscar time:", error);
       Alert.alert("Erro", "Erro ao buscar time.");
     }
-
-    try {
-      fetch(`${process.env.REACT_APP_API_URL}/api/user/add-player`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: id,
-          team_id: teamId,
-        }),
-      })
-        .then((data) => {
-          Alert.alert("Sucesso", "Jogador inserido com sucesso.");
-        })
-        .catch((error) => {
-          console.error("Erro ao inserir jogador:", error);
-          Alert.alert("Erro", "Erro ao inserir jogador.");
-        });
-    } catch (error) {
-      console.log("Erro ao adicionar jogador no time: " + error);
-    }
-
-    Alert.alert("Convidado", "Usuario convidado!!!");
   };
 
-return (
-  <Modal
-    animationType="slide"
-    transparent={true}
-    visible={visible}
-    onRequestClose={onClose}
-  >
-    <View style={styles.modalContainer}>
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitles}>Nome</Text>
-        <Text style={styles.modalText}>{name}</Text>
-        <Text style={styles.modalTitles}>Posição</Text>
-        <Text style={styles.modalText}>{position}</Text>
-        <Text style={styles.modalTitles}>Descrição</Text>
-        <Text style={styles.modalText}>{description}</Text>
+  useEffect(() => {
+    if (teamId && playerId) {
+      addPlayerToTeam();
+    }
+  }, [teamId]);
 
-        <View style={styles.modalButtons}>
-          <TouchableOpacity
-            style={[styles.modalButton, styles.modalButtonCancel]}
-            onPress={onClose}
-          >
-            <Text style={styles.modalButtonText}>Fechar detalhes</Text>
-          </TouchableOpacity>
+  const addPlayerToTeam = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/add-player`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: playerId,
+            team_id: teamId,
+          }),
+        }
+      );
 
-          <TouchableOpacity
-            style={[styles.modalButton, styles.modalButtonConfirm]}
-            onPress={invitePlayer}
-          >
-            <Text style={styles.modalButtonText}>Convidar</Text>
-          </TouchableOpacity>
+      if (response.ok) {
+        Alert.alert("Sucesso", "Jogador inserido com sucesso.");
+      } else {
+        const text = await response.text();
+        throw new Error(`Erro ao inserir jogador: ${text}`);
+      }
+    } catch (error) {
+      console.error("Erro ao inserir jogador:", error);
+      Alert.alert("Erro", "Erro ao inserir jogador.");
+    }
+  };
+
+  const invitePlayer = async () => {
+    setPlayerId(id); // Atualiza o playerId
+    await fetchTeamId();
+  };
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitles}>Nome</Text>
+          <Text style={styles.modalText}>{name}</Text>
+          <Text style={styles.modalTitles}>Posição</Text>
+          <Text style={styles.modalText}>{position}</Text>
+          <Text style={styles.modalTitles}>Descrição</Text>
+          <Text style={styles.modalText}>{description}</Text>
+
+          <View style={styles.modalButtons}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonCancel]}
+              onPress={onClose}
+            >
+              <Text style={styles.modalButtonText}>Fechar detalhes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonConfirm]}
+              onPress={invitePlayer}
+            >
+              <Text style={styles.modalButtonText}>Convidar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
-  </Modal>
-);
-}
+    </Modal>
+  );
+};
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

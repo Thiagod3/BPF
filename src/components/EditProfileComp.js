@@ -19,14 +19,45 @@ import { useNavigation } from "@react-navigation/native";
 const EditProfile = ({ onClose, onEditPosition }) => {
   const navigation = useNavigation();
 
+  const getCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permissão negada',
+          'Desculpe, nós precisamos de acesso à câmera.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 0.5,
+      });
+
+      if (!result.canceled) {
+        const resizedUri = await resizeImage(result.assets[0].uri);
+        const base64 = await convertToBase64(resizedUri);
+        if (base64) {
+          uploadImage(base64);
+        } else {
+          Alert.alert('Erro', 'Falha em converter a imagem para Base64.');
+        }
+      }
+    } catch (error) {
+      console.error('Error using camera:', error);
+    }
+  }
 
   const pickImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert(
-          'Permission Denied',
-          'Sorry, we need camera roll permissions to make this work.'
+          'Permissão negada',
+          'Desculpe, nós precisamos de acesso a galeria.'
         );
         return;
       }
@@ -45,7 +76,7 @@ const EditProfile = ({ onClose, onEditPosition }) => {
         if (base64) {
           uploadImage(base64);
         } else {
-          Alert.alert('Error', 'Failed to convert image to base64.');
+          Alert.alert('Error', 'Falha em converter a imagem para Base64.');
         }
       }
     } catch (error) {
@@ -101,11 +132,11 @@ const EditProfile = ({ onClose, onEditPosition }) => {
         throw new Error(`Server error: ${errorText}`);
       }
 
-      Alert.alert('Success', 'Image uploaded successfully');
+      Alert.alert('Success', 'Imagem atualizada com sucesso!');
       refreshPage();
 
     } catch (error) {
-      Alert.alert('Error', `Failed to upload image: ${error.message}`);
+      Alert.alert('Erro', `Falha no envio da imagem`);
     }
   };
 
@@ -121,7 +152,7 @@ const EditProfile = ({ onClose, onEditPosition }) => {
       <ButtonGroup
         buttons={[
           <View style={styles.buttonContainer}>
-            <Pressable style={styles.galleryButton}>
+            <Pressable style={styles.galleryButton} onPress={getCamera}>
               <FontAwesome name="camera" size={32} color="#FF731D" />
               <Text style={styles.buttonText}>Câmera</Text>
             </Pressable>

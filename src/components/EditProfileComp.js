@@ -136,7 +136,7 @@ const EditProfile = ({ onClose, onEditPosition }) => {
       refreshPage();
 
     } catch (error) {
-      Alert.alert('Erro', `Falha no envio da imagem`);
+      Alert.alert('Não suportado', `Falha no envio da imagem, por favor escolha uma imagem menor`);
     }
   };
 

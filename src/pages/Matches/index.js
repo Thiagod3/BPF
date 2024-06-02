@@ -205,7 +205,7 @@ export default function Matches() {
             navigation.navigate("FinishMatch");
           }}
         >
-          <Ionicons name="add-outline" size={32} color="#FF731D" />
+          <Ionicons name="football-outline" size={32} color="#FF731D" />
           <Text style={styles.matchText}>Começar a partida</Text>
         </TouchableOpacity>
       ) : (

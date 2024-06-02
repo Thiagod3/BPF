@@ -28,7 +28,7 @@ const CreateMatchComp = () => {
   const [location, setLocation] = useState("");
   const [contact, setContact] = useState("");
   const [dateMatch, setDateMatch] = useState("");
-  const [price, setPriceValue] = useState(0);
+  const [price, setPriceValue] = useState("");
 
 
   const [user, setUser] = useState("");
@@ -153,7 +153,7 @@ const CreateMatchComp = () => {
       location: location,
       field: selectedField,
       paid: selectedPrice,
-      price: selectedPrice === 1 ? price : null,
+      price: selectedPrice === 1 ? Number(price) : null,
       date: dateMatch,
       time_organizador_id: team,
       contact: contact
@@ -284,7 +284,7 @@ const CreateMatchComp = () => {
               placeholder="Digite o preço"
               style={styles.input}
               value={price}
-              onChangeText={setPriceValue}
+              onChangeText={(text) => setPriceValue(text)}
               keyboardType="numeric"
             />
           </View>

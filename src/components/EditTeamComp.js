@@ -11,6 +11,8 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 const EditTeam = ({ onClose }) => {
   const navigation = useNavigation();
@@ -108,7 +110,7 @@ const EditTeam = ({ onClose }) => {
 
   const uploadImage = async (base64Image) => {
     try {
-      const apiUrl = `${process.env.REACT_APP_API_URL}/api/team/uploadImage`;
+      const apiUrl = `${apiURL}/api/team/uploadImage`;
       const userId = await AsyncStorage.getItem('userId');
       const data = {
         image: base64Image,

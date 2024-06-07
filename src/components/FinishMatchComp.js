@@ -7,6 +7,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 import TeamCardComp from './TeamCardComp';
+import api from '../../config/api';
+import apiURL from '../utils/API';
 
 export default function FinishMatchComp() {
   const navigation = useNavigation();
@@ -24,7 +26,7 @@ export default function FinishMatchComp() {
     //Fetch para obter todos os times
     const fetchTeams = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/teams`);
+        const response = await fetch(`${apiURL}/api/teams`);
         if (!response.ok) {
           throw new Error("Erro ao buscar times: " + response.statusText);
         }
@@ -62,7 +64,7 @@ export default function FinishMatchComp() {
         }
 
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+          `${apiURL}/user/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -90,7 +92,7 @@ export default function FinishMatchComp() {
   const fetchUserTeam = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/team/${userId}`
+        `${apiURL}/api/user/team/${userId}`
       );
 
       if (!response.ok) {
@@ -129,7 +131,7 @@ export default function FinishMatchComp() {
     console.log(match)
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/matches/delete/${userTeam[0].id}`, {
+      const response = await fetch(`${apiURL}/api/matches/delete/${userTeam[0].id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -154,7 +156,7 @@ export default function FinishMatchComp() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/teams/incrementMatches/${userTeam[0].id}/${selectedTeamId}`, {
+      const response = await fetch(`${apiURL}/api/teams/incrementMatches/${userTeam[0].id}/${selectedTeamId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

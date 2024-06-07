@@ -15,6 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import EditTeamComp from "./EditTeamComp";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 export default function CreateNewTeam() {
   const [opt, setOpt] = useState(false);
@@ -48,7 +50,7 @@ export default function CreateNewTeam() {
     try {
         
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/team/create`,
+        `${apiURL}/api/team/create`,
         {
           method: "POST",
           headers: {

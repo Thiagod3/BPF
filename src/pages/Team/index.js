@@ -15,6 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import HeaderComp from "../../components/HeaderComp.js";
 import UncreatedTeamComp from "../../components/UncreatedTeamComp.js";
 import CreatedTeamComp from "../../components/CreatedTeamComp.js";
+import api from "../../../config/api.js";
+import apiURL from "../../utils/API.js";
 
 export default function CreateTeam() {
   const navigation = useNavigation();
@@ -37,7 +39,7 @@ export default function CreateTeam() {
 
         // Faz uma solicitação ao servidor para obter os dados do usuário
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+          `${apiURL}/user/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -66,7 +68,7 @@ export default function CreateTeam() {
   const fetchUserTeam = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/team/${userId}`
+        `${apiURL}/api/user/team/${userId}`
       );
 
       if (!response.ok) {

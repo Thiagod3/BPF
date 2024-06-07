@@ -18,6 +18,8 @@ import MatchCardComp from "../../components/MatchCardComp.js";
 
 //utils criadas
 import BackHandlerComponent from "../../utils/BackHandlerComponent.js";
+import api from "../../../config/api.js";
+import apiURL from "../../utils/API.js";
 
 export default function Matches() {
 
@@ -39,7 +41,7 @@ export default function Matches() {
     useCallback(() => {
       const fetchMatchs = async () => {
         try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/matches`);
+          const response = await fetch(`${apiURL}/api/matches`);
           if (!response.ok) {
             throw new Error("Erro ao buscar partidas: " + response.statusText);
           }
@@ -94,7 +96,7 @@ export default function Matches() {
 
         // Faz uma solicitação ao servidor para obter os dados do usuário
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+          `${apiURL}/user/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -122,7 +124,7 @@ export default function Matches() {
   const fetchUserTeam = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/team/${userId}`
+        `${apiURL}/api/user/team/${userId}`
       );
 
       if (!response.ok) {

@@ -17,6 +17,8 @@ import { useNavigation,  } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 const CreateMatchComp = () => {
   
@@ -57,7 +59,7 @@ const CreateMatchComp = () => {
 
         // Faz uma solicitação ao servidor para obter os dados do usuário
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+          `${apiURL}/user/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -86,7 +88,7 @@ const CreateMatchComp = () => {
   const fetchUserTeam = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/team/${userId}`
+        `${apiURL}/api/user/team/${userId}`
       );
 
       if (!response.ok) {
@@ -163,7 +165,7 @@ const CreateMatchComp = () => {
     console.log(match)
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/matches/create`, {
+      const response = await fetch(`${apiURL}/api/matches/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

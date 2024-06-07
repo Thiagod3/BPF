@@ -13,6 +13,7 @@ import {
   Alert,
   Modal,
 } from "react-native";
+import apiURL from "../../utils/API";
 
 
 export default function CreateAccount() {
@@ -51,7 +52,7 @@ export default function CreateAccount() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/users/create`,
+        `${apiURL}/api/users/create`,
         {
           method: "POST",
           headers: {

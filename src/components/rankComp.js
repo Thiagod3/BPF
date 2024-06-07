@@ -2,6 +2,8 @@ import { FlatList, View, StyleSheet, Text, Image, ScrollView } from "react-nativ
 import { useState, useEffect, useCallback } from "react";
 
 import { useFocusEffect } from "@react-navigation/native";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 
 export default function RankComp() {
@@ -12,7 +14,7 @@ export default function RankComp() {
       // Função para buscar usuários da API
       const fetchTeams = async () => {
         try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/teams`);
+          const response = await fetch(`${apiURL}/api/teams`);
           if (!response.ok) {
             throw new Error("Erro ao buscar times: " + response.statusText);
           }

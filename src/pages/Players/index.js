@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState, useCallback } from "react";
 
 import { useFocusEffect } from "@react-navigation/native";
+import api from "../../../config/api.js";
+import apiURL from "../../utils/API.js";
 
 export default function Players() {
   const [users, setUsers] = useState([]);
@@ -29,7 +31,7 @@ export default function Players() {
       const fetchUsers = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/api/users`
+            `${apiURL}/api/users`
           );
           if (!response.ok) {
             throw new Error("Erro ao buscar usuários: " + response.statusText);

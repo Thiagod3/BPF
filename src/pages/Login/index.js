@@ -10,16 +10,24 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+import Config from "react-native-config";
+import Constants from 'expo-constants';
+import apiURL from "../../utils/API";
+
 
 export default function Login() {
   const navigation = useNavigation();
+
+  
+// const apiUrl = Constants.manifest.extra.REACT_APP_API_URL;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+      console.log(apiURL)
+      const response = await fetch(`${apiURL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

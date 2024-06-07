@@ -5,6 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState, useCallback } from "react";
 import { Button, } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,7 +35,7 @@ export default function EditPositionComp({onClose}) {
                 }
 
                 const response = await fetch(
-                    `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+                    `${apiURL}/user/profile/${userId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -64,7 +66,7 @@ export default function EditPositionComp({onClose}) {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/position/${user.id}/${position}`, {
+            const response = await fetch(`${apiURL}/api/user/update/position/${user.id}/${position}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

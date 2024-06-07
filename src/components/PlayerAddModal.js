@@ -9,6 +9,8 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 const PlayerAddModal = ({
   visible,
@@ -27,7 +29,7 @@ const PlayerAddModal = ({
 
       if (userId) {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/user/team-by-admin/${userId}`
+          `${apiURL}/api/user/team-by-admin/${userId}`
         );
 
         if (!response.ok) {
@@ -57,7 +59,7 @@ const PlayerAddModal = ({
   const addPlayerToTeam = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/add-player`,
+        `${apiURL}/api/user/add-player`,
         {
           method: "POST",
           headers: {

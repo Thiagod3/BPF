@@ -9,6 +9,8 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 const TeamPlayersModal = ({ visible, onClose, team }) => {
   const [teamPlayers, setTeamPlayers] = useState([]);
@@ -16,7 +18,7 @@ const TeamPlayersModal = ({ visible, onClose, team }) => {
   const fetchPlayers = async (teamId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/teamPlayers/${teamId}`
+        `${apiURL}/api/teamPlayers/${teamId}`
       );
 
       if (!response.ok) {

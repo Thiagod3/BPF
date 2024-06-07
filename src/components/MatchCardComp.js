@@ -5,6 +5,8 @@ import Modal from "./layout/Modal";
 
 //Utils Criadas
 import renderImage from "../utils/renderImage";
+import api from "../../config/api";
+import apiURL from "../utils/API";
 
 const MatchCardComp = ({
   id,
@@ -25,7 +27,7 @@ const MatchCardComp = ({
   async function showMatch() {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/matches/${matchId}`
+        `${apiURL}/api/matches/${matchId}`
       );
       if (!response.ok) {
         throw new Error(

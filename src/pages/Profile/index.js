@@ -23,6 +23,8 @@ import EditPositionComp from "../../components/EditPositionComp";
 import EditCityComp from "../../components/EditCityComp";
 import mapPositionToCode from "../../utils/mapPositionToCode";
 import renderImage from "../../utils/renderImage";
+import api from "../../../config/api";
+import apiURL from "../../utils/API";
 
 export default function Profile() {
   const navigation = useNavigation();
@@ -52,7 +54,7 @@ export default function Profile() {
         }
 
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/profile/${userId}`,
+          `${apiURL}/user/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -80,7 +82,7 @@ export default function Profile() {
   const fetchUserTeam = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/team/${userId}`
+        `${apiURL}/api/user/team/${userId}`
       );
 
       if (!response.ok) {
@@ -106,7 +108,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/bio/${user.id}/${bio}`, {
+      const response = await fetch(`${apiURL}/api/user/update/bio/${user.id}/${bio}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -135,7 +137,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/update/city/${user.id}/${city}`, {
+      const response = await fetch(`${apiURL}/api/user/update/city/${user.id}/${city}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

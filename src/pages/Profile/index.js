@@ -97,8 +97,8 @@ export default function Profile() {
   };
 
   const handleUpdateBio = () => {
-    updateBio();  // Chame a função de atualização
-    inputRef.current.blur();  // Desfoque o TextInput
+    updateBio();  
+    inputRef.current.blur(); 
   };
 
   async function updateBio() {

@@ -94,6 +94,8 @@ export default function CreateTeamComp({ team }) {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    width: "100%",
     gap: 20,
   },
   teamPic: {
@@ -108,8 +110,9 @@ const styles = StyleSheet.create({
   InnerContainer: {
     flexDirection: "column",
     alignItems: "center",
-    width: "100%",
+    width: "90%",
     backgroundColor: "#D9D9D9",
+    margin: 10,
     borderRadius: 10,
   },
   titleContainer: {

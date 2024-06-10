@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import api from "../../config/api";
 import apiURL from "../utils/API";
 
-const PlayerAddModal = ({
+const VerMaisModal = ({
   visible,
   onClose,
   id,
@@ -20,7 +20,6 @@ const PlayerAddModal = ({
   position,
   description,
 }) => {
-  const navigation = useNavigation();
   const [teamId, setTeamId] = useState("");
   const [playerId, setPlayerId] = useState(null);
 
@@ -75,7 +74,6 @@ const PlayerAddModal = ({
 
       if (response.ok) {
         Alert.alert("Sucesso", "Jogador inserido com sucesso.");
-        refreshPage();
       } else {
         const text = await response.text();
         throw new Error(`Erro ao inserir jogador: ${text}`);
@@ -86,15 +84,9 @@ const PlayerAddModal = ({
     }
   };
 
-  const invitePlayer = async () => {
-    setPlayerId(id); // Atualiza o playerId
-    await fetchTeamId();
+  const deletePlayer = async () => {
+    console.log("expulseeeeiiii")
   };
-
-  const refreshPage = useCallback(() => {
-    navigation.navigate('Matches')
-    navigation.navigate('Players', { key: Math.random().toString() });
-  }, [navigation]);
 
   return (
     <Modal
@@ -122,9 +114,9 @@ const PlayerAddModal = ({
 
             <TouchableOpacity
               style={[styles.modalButton, styles.modalButtonConfirm]}
-              onPress={invitePlayer}
+              onPress={deletePlayer}
             >
-              <Text style={styles.modalButtonText}>Convidar</Text>
+              <Text style={styles.modalButtonText}>Expulsar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -193,4 +185,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlayerAddModal;
+export default VerMaisModal;

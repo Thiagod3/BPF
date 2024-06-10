@@ -16,7 +16,7 @@ app.get("/api/teamPlayers/:teamId", (req, res) => {
   //console.log(teamId)
 
   const query = `
-  select t.id as ID_Time, t.name as TEAM, t.numberPlayers as Numero_de_Jogadores, j.usuario_id as Jogador_ID, u.name as Jogador, u.position as position
+  select t.id as ID_Time, t.name as TEAM, t.numberPlayers as Numero_de_Jogadores, j.usuario_id as Jogador_ID, u.name as Jogador, u.position as position, u.image as image, u.description as description
   from Teams as t
   join Jogadores as j on t.id = j.time_id
   join Users as u on j.usuario_id = u.id where t.id = ?`;

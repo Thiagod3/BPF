@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
   Modal,
   StyleSheet,
   TouchableOpacity,
-  Alert,
+  ScrollView
 } from "react-native";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../config/api";
 import apiURL from "../utils/API";
+import renderImagePlayers from "../utils/renderImagePlayers";
+import mapPositionToCode from "../utils/mapPositionToCode";
+import VerMais from "./VerMaisModal";
 
 const TeamPlayersModal = ({ visible, onClose, team }) => {
   const [teamPlayers, setTeamPlayers] = useState([]);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   const fetchPlayers = async (teamId) => {
     try {
@@ -26,7 +29,6 @@ const TeamPlayersModal = ({ visible, onClose, team }) => {
       }
 
       const data = await response.json();
-      console.log(data);
       setTeamPlayers(data);
     } catch (error) {
       console.log(
@@ -41,6 +43,14 @@ const TeamPlayersModal = ({ visible, onClose, team }) => {
     }
   }, [team]);
 
+  const handlePlayerSelect = (player) => {
+    setSelectedPlayer(player);
+  };
+
+  const handleModalClose = () => {
+    setSelectedPlayer(null);
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -50,18 +60,39 @@ const TeamPlayersModal = ({ visible, onClose, team }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          {teamPlayers.length > 0 ? (
-            teamPlayers.map((player) => (
-              <View key={player.Jogador_ID} style={styles.playerContainer}>
-                <Text style={styles.playerTitle}>{player.Jogador}</Text>
-                <Text style={styles.playerName}>{player.position}</Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noPlayer}>
-              Não Possui jogadores
-            </Text>
-          )}
+          <ScrollView style={styles.scrollContainer} overScrollMode="never">
+            {teamPlayers.length > 0 ? (
+              teamPlayers.map((player) => (
+                <View key={player.Jogador_ID} style={styles.playerContainer}>
+                  <View style={styles.ImgContainer}>
+                    {renderImagePlayers(player.image)}
+                    <Text style={styles.playerPos}>{mapPositionToCode(player.position)}</Text>
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() => handlePlayerSelect(player)}
+                    style={styles.expdContainer}
+                  >
+                    <View style={styles.infoContainer}>
+                      <Text style={styles.playerName}>{player.Jogador}</Text>
+                      <Text
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                        style={styles.playerDesc}
+                      >
+                        {player.description}
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={36} color="black" />
+                  </TouchableOpacity>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noPlayer}>
+                Não Possui jogadores
+              </Text>
+            )}
+          </ScrollView>
 
           <View style={styles.modalButtons}>
             <TouchableOpacity
@@ -73,6 +104,17 @@ const TeamPlayersModal = ({ visible, onClose, team }) => {
           </View>
         </View>
       </View>
+
+      {selectedPlayer && (
+        <VerMais
+          visible={!!selectedPlayer}
+          onClose={handleModalClose}
+          name={selectedPlayer.Jogador}
+          position={selectedPlayer.position}
+          description={selectedPlayer.description}
+          id={selectedPlayer.Jogador_ID}
+        />
+      )}
     </Modal>
   );
 };
@@ -86,7 +128,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
+    height: 500,
     backgroundColor: "#D9D9D9",
+    gap: 10,
     padding: 20,
     borderRadius: 10,
     elevation: 5,
@@ -114,24 +158,51 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     color: "#FF731D",
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: "bold"
+  },
+  scrollContainer: {
+    width: "100%",
   },
   playerContainer: {
     display: 'flex',
     width: "100%",
     flexDirection: "row",
-    justifyContent: 'space-between',
     alignItems: "center",
-    paddingBottom: 5,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBlockColor: '#113B8F'
+    gap: 20,
+    padding: 10,
+    marginTop: 10,
+    borderWidth: 2,
+    borderRadius: 10,
+    borderBlockColor: '#113B8F',
+    backgroundColor: "#C0C0C0",
   },
-  playerTitle: {
-    fontWeight: "bold",
+  infoContainer: {
+    width: "50%"
+  },
+  expdContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+  },
+  ImgContainer: {
+    alignItems: "center",
+    gap: -15
   },
   playerName: {
-    fontSize: 16,
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  playerDesc: {
+  },
+  playerPos: {
+    textAlign: "center",
+    height: 20,
+    width: 50,
+    color: "#F2F2F2",
+    backgroundColor: "#113B8F",
+    borderRadius: 10,
   },
   noPlayer: {
     textAlign: 'center',

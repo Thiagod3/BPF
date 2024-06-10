@@ -116,7 +116,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#808080",
   },
   CTeam: {
-    height: "85%",
+    width: "100%",
+    height: "100%",
     margin: 15,
   },
   header: {

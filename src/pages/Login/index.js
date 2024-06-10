@@ -10,16 +10,11 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import Config from "react-native-config";
-import Constants from 'expo-constants';
 import apiURL from "../../utils/API";
 
 
 export default function Login() {
   const navigation = useNavigation();
-
-  
-// const apiUrl = Constants.manifest.extra.REACT_APP_API_URL;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

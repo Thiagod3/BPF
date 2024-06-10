@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    height: 500,
+    maxHeight: 500,
     backgroundColor: "#D9D9D9",
     gap: 10,
     padding: 20,

@@ -21,9 +21,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import EditProfile from "../../components/EditProfileComp";
 import EditPositionComp from "../../components/EditPositionComp";
 import EditCityComp from "../../components/EditCityComp";
+import EditBioComp from "../../components/EditBioComp";
 import mapPositionToCode from "../../utils/mapPositionToCode";
 import renderImage from "../../utils/renderImage";
-import api from "../../../config/api";
 import apiURL from "../../utils/API";
 
 export default function Profile() {
@@ -33,6 +33,7 @@ export default function Profile() {
   const [modalVisible, setModalVisible] = useState(false);
   const [positionModalVisible, setPositionModalVisible] = useState(false);
   const [cityModalVisible, setCityModalVisible] = useState(false);
+  const [bioModalVisible, setBioModalVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
@@ -96,12 +97,8 @@ export default function Profile() {
     }
   };
 
-  const handleUpdateBio = () => {
-    updateBio();  
-    inputRef.current.blur(); 
-  };
-
   async function updateBio() {
+    console.log('Iniciando atualização da bio...');
     const userData = {
       id: user.id,
       newBio: bio
@@ -122,13 +119,24 @@ export default function Profile() {
       console.log('Dados enviados com sucesso para a API.');
       refreshPage();
     } catch (error) {
-      console.error('Erro:', error.message);
+      console.error('Erro ao atualizar bio:', error.message);
     }
   }
 
   const handleShowOpt = () => {
     setOpt(!opt);
   };
+
+  const handleUpdateBio = (newBio) => {
+    setBio(newBio);
+  };
+
+  useEffect(() => {
+    if (bio) {
+      updateBio(user.id, bio);
+      refreshPage();
+    }
+  }, [bio, user.id]);
 
   async function updateCity() {
     const userData = {
@@ -150,7 +158,7 @@ export default function Profile() {
 
       console.log('Dados enviados com sucesso para a API.');
     } catch (error) {
-      console.error('Erro:', error.message);
+      console.error('Erro ao atualizar cidade:', error.message);
     }
   }
 
@@ -162,7 +170,6 @@ export default function Profile() {
     if (city) {
       updateCity(user.id, city);
       refreshPage();
-
     }
   }, [city, user.id]);
 
@@ -213,30 +220,12 @@ export default function Profile() {
         </View>
 
         <View style={styles.infoBio}>
-          <Pressable style={styles.pressable}>
-            <TextInput
-              ref={inputRef}
-              placeholder={user.description}
-              style={styles.bio}
-              value={bio}
-              onChangeText={setBio}
-              multiline={true}
-              onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
+          <Pressable style={styles.pressable} onPress={() => {
+            setBioModalVisible(true);
+          }}>
+              <Text style={styles.bio}>{user.description}</Text>
+              <Text style={styles.inputText}>Pressione para editar</Text>
           </Pressable >
-          {isFocused ? (
-            <Button
-              containerStyle={styles.button}
-              color={"#FF731D"}
-              onPress={handleUpdateBio}
-            >
-              Atualizar bio
-            </Button>
-          ) : (
-            <Text style={styles.inputText}>Pressione para editar</Text>)}
-
         </View>
 
 
@@ -269,6 +258,7 @@ export default function Profile() {
           }}
         />
       </View>
+
 
       <View style={styles.header}>
         <Header />
@@ -326,6 +316,21 @@ export default function Profile() {
           onClose={() => setCityModalVisible(false)}
         />
       </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={bioModalVisible}
+        onRequestClose={() => {
+          setBioModalVisible(false);
+        }}
+        containerStyle={styles.modal}
+      >
+        <EditBioComp
+          onUpdateBio={handleUpdateBio}
+          onClose={() => setBioModalVisible(false)}
+        />
+      </Modal>
     </View>
   );
 }
@@ -351,7 +356,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     paddingVertical: 10,
-  },  
+  },
   infoBio: {
     alignItems: "center",
     paddingVertical: 10,
@@ -412,34 +417,31 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
   },
+  alignSelf: "center",
   button: {
     alignSelf: "center",
-    button: {
-      alignSelf: "center",
-      width: "60%",
-      borderRadius: 20,
-      marginTop: 40,
-      marginBottom: 10,
-    },
-    pressable: {
-      flexDirection: "collumn",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: 20,
-    },
-    inputText: {
-      alignSelf: "center",
-      color: "#808080"
-    },
-    cityContainer: {
-      flex: 1,
-      backgroundColor: "rgba(1, 1, 1, 0.45)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    modal: {
-      alignItems: "center",
-      justifyContent: "center",
-    }
+    width: "60%",
+    borderRadius: 20,
+    marginTop: 40,
+    marginBottom: 10,
+  },
+  pressable: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+  inputText: {
+    alignSelf: "center",
+    color: "#808080",
+  },
+  cityContainer: {
+    flex: 1,
+    backgroundColor: "rgba(1, 1, 1, 0.45)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modal: {
+    alignItems: "center",
+    justifyContent: "center",
   }
 });

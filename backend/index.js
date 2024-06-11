@@ -60,7 +60,7 @@ app.get("/api/user/team-by-admin/:user_admin_id", (req, res) => {
 app.post("/api/user/add-player", (req, res) => {
   const { user_id, team_id } = req.body;
 
-  console.log("Usuario: " + user_id + "Time: " + team_id);
+  console.log("Usuario: " + user_id + " Time: " + team_id);
 
   if (!user_id || !team_id) {
     return res
@@ -68,13 +68,38 @@ app.post("/api/user/add-player", (req, res) => {
       .send("Os campos user_id e team_id são obrigatórios.");
   }
 
-  const query = "INSERT INTO jogadores (usuario_id, time_id) VALUES (?, ?)";
-  conn.query(query, [user_id, team_id], (err, result) => {
+  const checkPlayerQuery = "SELECT * FROM jogadores WHERE usuario_id = ?";
+  conn.query(checkPlayerQuery, [user_id], (err, playerResult) => {
     if (err) {
-      console.error("Erro ao inserir jogador:", err);
-      return res.status(500).send("Erro ao inserir jogador.");
+      console.error("Erro ao verificar jogador:", err);
+      return res.status(500).send("Erro ao verificar jogador.");
     }
-    res.status(200).send("Jogador inserido com sucesso.");
+
+    if (playerResult.length > 0) {
+      return res.status(409).send("Este jogador já está cadastrado no time.");
+    }
+    const checkAdminQuery = "SELECT * FROM teams WHERE user_admin_id = ?";
+    conn.query(checkAdminQuery, [user_id], (err, adminResult) => {
+      if (err) {
+        console.error("Erro ao verificar administrador:", err);
+        return res.status(500).send("Erro ao verificar administrador.");
+      }
+
+      if (adminResult.length === 0) {
+        // Se o jogador não for administrador de nenhum time, insira como jogador
+        const insertQuery = "INSERT INTO jogadores (usuario_id, time_id) VALUES (?, ?)";
+        conn.query(insertQuery, [user_id, team_id], (err, insertResult) => {
+          if (err) {
+            console.error("Erro ao inserir jogador:", err);
+            return res.status(500).send("Erro ao inserir jogador.");
+          }
+          res.status(200).send("Jogador inserido com sucesso.");
+        });
+      } else {
+        // Se o jogador for administrador de algum time, retorne um erro
+        return res.status(403).send("Este jogador é um administrador de outro time.");
+      }
+    });
   });
 });
 

@@ -59,26 +59,28 @@ const PlayerAddModal = ({
 
   const addPlayerToTeam = async () => {
     try {
-      const response = await fetch(
-        `${apiURL}/api/user/add-player`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: playerId,
-            team_id: teamId,
-          }),
-        }
-      );
+      const response = await fetch(`${apiURL}/api/user/add-player`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: playerId,
+          team_id: teamId,
+        }),
+      });
 
       if (response.ok) {
         Alert.alert("Sucesso", "Jogador inserido com sucesso.");
         refreshPage();
       } else {
-        const text = await response.text();
-        throw new Error(`Erro ao inserir jogador: ${text}`);
+        if (response.status === 409 || response.status === 403) {
+          // Se o jogador já estiver cadastrado no time
+          Alert.alert("Indisponivel", "Este jogador já está cadastrado em um time.");
+        } else {
+          const text = await response.text();
+          throw new Error(`Erro ao inserir jogador: ${text}`);
+        }
       }
     } catch (error) {
       console.error("Erro ao inserir jogador:", error);
@@ -92,8 +94,8 @@ const PlayerAddModal = ({
   };
 
   const refreshPage = useCallback(() => {
-    navigation.navigate('Matches')
-    navigation.navigate('Players', { key: Math.random().toString() });
+    navigation.navigate("Matches");
+    navigation.navigate("Players", { key: Math.random().toString() });
   }, [navigation]);
 
   return (

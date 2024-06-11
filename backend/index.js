@@ -11,6 +11,22 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.delete("/api/user/deletePlayer/:teamId/:playerId", (req, res) => {
+  const teamId = req.params.teamId
+  const playerId = req.params.playerId
+
+  const query = "DELETE FROM jogadores WHERE time_id = ? AND usuario_id = ?;"
+
+  conn.query(query, [teamId, playerId], (err, results) => {
+    if(err) {
+      console.log('Erro na busca de jogadores: ' + err)
+      return res.status(500).send("Erro ao buscar Jogadores.");
+    }
+
+    return res.status(200).send("Usuario: deletado com sucesso");
+  })
+})
+
 app.get("/api/teamPlayers/:teamId", (req, res) => {
   const teamId = req.params.teamId;
   //console.log(teamId)
@@ -26,11 +42,6 @@ app.get("/api/teamPlayers/:teamId", (req, res) => {
       console.log('Erro na busca de jogadores: ' + err)
       return res.status(500).send("Erro ao buscar Jogadores.");
     }
-
-    // if (results.length === 0) {
-    //   return res.status(404).send("Jogadores não encontrados.");
-    // }
-
    
     return res.status(200).json(results);
 

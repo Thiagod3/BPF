@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,8 @@ import {
   Alert,
 } from "react-native";
 
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../config/api";
 import apiURL from "../utils/API";
 
 const VerMaisModal = ({
@@ -20,6 +20,7 @@ const VerMaisModal = ({
   position,
   description,
 }) => {
+  const navigation = useNavigation();
   const [teamId, setTeamId] = useState("");
   const [playerId, setPlayerId] = useState(null);
 
@@ -52,41 +53,40 @@ const VerMaisModal = ({
 
   useEffect(() => {
     if (teamId && playerId) {
-      addPlayerToTeam();
+      deletePlayer(teamId, playerId);
     }
-  }, [teamId]);
+  }, [teamId, playerId]);
 
-  const addPlayerToTeam = async () => {
+  const deletePlayer = async (teamId, playerId) => {
     try {
-      const response = await fetch(
-        `${apiURL}/api/user/add-player`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: playerId,
-            team_id: teamId,
-          }),
-        }
-      );
+      const response = await fetch(`${apiURL}/api/user/deletePlayer/${teamId}/${playerId}`, {
+        method: "DELETE",
+      });
 
-      if (response.ok) {
-        Alert.alert("Sucesso", "Jogador inserido com sucesso.");
-      } else {
-        const text = await response.text();
-        throw new Error(`Erro ao inserir jogador: ${text}`);
+      if (!response.ok) {
+        throw new Error("Erro ao fazer requisição de deletar usuário");
       }
+
+      if (response.status === 200) {
+        Alert.alert("Deletado", "Jogador expulso do time!");
+        refreshPage();
+      }
+
     } catch (error) {
-      console.error("Erro ao inserir jogador:", error);
-      Alert.alert("Erro", "Erro ao inserir jogador.");
+      console.error("Erro ao deletar o jogador:", error);
+      Alert.alert("Erro", "Erro ao deletar o jogador.");
     }
   };
 
-  const deletePlayer = async () => {
-    console.log("expulseeeeiiii")
+  const btnDelete = async () => {
+    setPlayerId(id); // Atualiza o playerId
+    await fetchTeamId();
   };
+
+  const refreshPage = useCallback(() => {
+    navigation.navigate("Matches");
+    navigation.navigate("Team", { key: Math.random().toString() });
+  }, [navigation]);
 
   return (
     <Modal
@@ -114,7 +114,7 @@ const VerMaisModal = ({
 
             <TouchableOpacity
               style={[styles.modalButton, styles.modalButtonConfirm]}
-              onPress={deletePlayer}
+              onPress={btnDelete}
             >
               <Text style={styles.modalButtonText}>Expulsar</Text>
             </TouchableOpacity>

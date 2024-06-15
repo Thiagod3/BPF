@@ -11,16 +11,22 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import EditTeamComp from "./EditTeamComp";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import TeamPlayersModal from "./TeamPlayersModal";
 
 import renderImage from "../utils/renderImage";
 
 import { useState } from "react";
 
-export default function CreateTeamComp({ team }) {
+export default function CreateTeamComp({ team, userId }) {
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [PlayerAddVisibility, setPlayerAddVisibility] = useState(false);
+
+  // console.log("Admin: " + team[0].user_admin_id)
+  // console.log("Jogador: " + team[0].Jogador_ID)
+  // console.log("Usuario logado: " + userId)
 
   const handleShowopt = () => {
     setOpt(!opt);
@@ -30,12 +36,14 @@ export default function CreateTeamComp({ team }) {
     <View style={styles.container}>
       <View style={styles.teamPic}>
         {/* <Image source={{ uri: `${team[0].image}`}} style={styles.profilePic} /> */}
-        {team[0].image && (
-            renderImage(team[0].image)
+        {team[0].teamImage && (
+            renderImage(team[0].teamImage)
         ) || (
             <Image source={require("../../assets/BoraProFutOutline.png")} />
         )}
-        <Button
+        {/* Dois campos de admin para o retorno de cada requisição */}
+        {team[0].Admin == team[0].Jogador_ID || team[0].user_admin_id == userId  && (
+          <Button
           color="#FF731D"
           icon={
             <MaterialCommunityIcons
@@ -50,11 +58,13 @@ export default function CreateTeamComp({ team }) {
             setModalVisible(true);
           }}
         />
+        )}
+        
       </View>
 
       <View style={styles.InnerContainer}>
         <View style={styles.titleContainer}>
-          <Text style={styles.teamTitle}>{team[0].name}</Text>
+          <Text style={styles.teamTitle}>{team[0].TEAM}</Text>
         </View>
         <View style={styles.bioContainer}>
           <Text style={styles.bioText}>{team[0].description}</Text>
@@ -71,7 +81,7 @@ export default function CreateTeamComp({ team }) {
         onPress={() => setPlayerAddVisibility(true)}
       />
 
-      <TeamPlayersModal team={team}  visible={PlayerAddVisibility} onClose={() => setPlayerAddVisibility(false)} />
+      <TeamPlayersModal team={team} userId={userId}  visible={PlayerAddVisibility} onClose={() => setPlayerAddVisibility(false)} />
 
       <Modal
         animationType="slide"

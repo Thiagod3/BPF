@@ -15,7 +15,6 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import api from "../../config/api";
 import apiURL from "../utils/API";
 
 const EditProfile = ({ onClose, onEditPosition }) => {

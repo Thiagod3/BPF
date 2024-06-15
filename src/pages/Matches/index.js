@@ -128,7 +128,13 @@ export default function Matches() {
       );
 
       if (!response.ok) {
-        throw new Error("Erro ao carregar dados do time");
+        if (response.status === 404) {
+          console.log("Time não encontrado");
+          return;
+        } else {
+          console.log("Erro puxado: " + JSON.stringify(response));
+          throw new Error("Erro ao carregar dados do time");
+        }
       }
 
       const teamData = await response.json();

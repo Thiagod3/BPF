@@ -19,6 +19,8 @@ const VerMaisModal = ({
   name,
   position,
   description,
+  team,
+  userId,
 }) => {
   const navigation = useNavigation();
   const [teamId, setTeamId] = useState("");
@@ -59,9 +61,12 @@ const VerMaisModal = ({
 
   const deletePlayer = async (teamId, playerId) => {
     try {
-      const response = await fetch(`${apiURL}/api/user/deletePlayer/${teamId}/${playerId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${apiURL}/api/user/deletePlayer/${teamId}/${playerId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Erro ao fazer requisição de deletar usuário");
@@ -71,7 +76,6 @@ const VerMaisModal = ({
         Alert.alert("Deletado", "Jogador expulso do time!");
         refreshPage();
       }
-
     } catch (error) {
       console.error("Erro ao deletar o jogador:", error);
       Alert.alert("Erro", "Erro ao deletar o jogador.");
@@ -112,12 +116,14 @@ const VerMaisModal = ({
               <Text style={styles.modalButtonText}>Fechar detalhes</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.modalButton, styles.modalButtonConfirm]}
-              onPress={btnDelete}
-            >
-              <Text style={styles.modalButtonText}>Expulsar</Text>
-            </TouchableOpacity>
+            {team[0].Admin == team[0].Jogador_ID || team[0].user_admin_id == userId  && (
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm]}
+                onPress={btnDelete}
+              >
+                <Text style={styles.modalButtonText}>Expulsar</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>

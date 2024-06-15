@@ -34,14 +34,12 @@ export default function Profile() {
   const [positionModalVisible, setPositionModalVisible] = useState(false);
   const [cityModalVisible, setCityModalVisible] = useState(false);
   const [bioModalVisible, setBioModalVisible] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
   const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
   const [bio, setBio] = useState("");
   const [city, setCity] = useState("");
-  const [inputHeight, setInputHeight] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -87,7 +85,13 @@ export default function Profile() {
       );
 
       if (!response.ok) {
-        throw new Error("Erro ao carregar dados do time");
+        if (response.status === 404) {
+          console.log("Time não encontrado");
+          return;
+        } else {
+          console.log("Erro puxado: " + JSON.stringify(response));
+          throw new Error("Erro ao carregar dados do time");
+        }
       }
 
       const teamData = await response.json();
@@ -99,10 +103,6 @@ export default function Profile() {
 
   async function updateBio() {
     console.log('Iniciando atualização da bio...');
-    const userData = {
-      id: user.id,
-      newBio: bio
-    }
 
     try {
       const response = await fetch(`${apiURL}/api/user/update/bio/${user.id}/${bio}`, {
@@ -188,10 +188,10 @@ export default function Profile() {
         {(team && team.length > 0 && (
           <View style={styles.info} id="team">
             <Text style={styles.infoText}>TIME</Text>
-            {(team[0].image && renderImage(team[0].image)) || (
+            {(team[0].teamImage && renderImage(team[0].teamImage)) || (
               <Image source={require("../../../assets/BoraProFutOutline.png")} />
             )}
-            <Text style={styles.infoText}>{team[0].name}</Text>
+            <Text style={styles.infoText}>{team[0].TEAM}</Text>
           </View>
         )) || (
             <View style={styles.info} id="team">

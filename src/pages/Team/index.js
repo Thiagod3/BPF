@@ -15,7 +15,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import HeaderComp from "../../components/HeaderComp.js";
 import UncreatedTeamComp from "../../components/UncreatedTeamComp.js";
 import CreatedTeamComp from "../../components/CreatedTeamComp.js";
-import api from "../../../config/api.js";
 import apiURL from "../../utils/API.js";
 
 export default function CreateTeam() {
@@ -72,7 +71,13 @@ export default function CreateTeam() {
       );
 
       if (!response.ok) {
-        throw new Error("Erro ao carregar dados do time");
+        if (response.status === 404) {
+          console.log("Time não encontrado");
+          return;
+        } else {
+          console.log("Erro puxado: " + JSON.stringify(response));
+          throw new Error("Erro ao carregar dados do time");
+        }
       }
 
       const teamData = await response.json();
@@ -88,6 +93,7 @@ export default function CreateTeam() {
         <View style={styles.CTeam}>
           <CreatedTeamComp
             team={team}
+            userId={user.id}
           />
         </View>
       ) : (

@@ -46,7 +46,11 @@ const PlayerAddModal = ({
         }
       }
     } catch (error) {
-      console.error("Erro ao buscar time:", error);
+      if(error.message == "Erro ao buscar time: Time não encontrado."){        
+        Alert.alert("Indisponivel", "Você precisa ser administrador de um time");  
+        return; 
+      }
+      console.error(error);
       Alert.alert("Erro", "Erro ao buscar time.");
     }
   };

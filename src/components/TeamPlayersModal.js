@@ -14,7 +14,7 @@ import renderImagePlayers from "../utils/renderImagePlayers";
 import mapPositionToCode from "../utils/mapPositionToCode";
 import VerMais from "./VerMaisModal";
 
-const TeamPlayersModal = ({ visible, onClose, team }) => {
+const TeamPlayersModal = ({ visible, onClose, team, userId }) => {
   const [teamPlayers, setTeamPlayers] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
@@ -113,6 +113,8 @@ const TeamPlayersModal = ({ visible, onClose, team }) => {
           position={selectedPlayer.position}
           description={selectedPlayer.description}
           id={selectedPlayer.Jogador_ID}
+          team={team}
+          userId={userId}
         />
       )}
     </Modal>

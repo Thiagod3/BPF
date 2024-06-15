@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
-  Image,
   TextInput,
   Pressable,
   Platform,
@@ -17,7 +15,6 @@ import { useNavigation,  } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
-import api from "../../config/api";
 import apiURL from "../utils/API";
 
 const CreateMatchComp = () => {
@@ -33,11 +30,11 @@ const CreateMatchComp = () => {
   const [price, setPriceValue] = useState("");
 
 
-  const [user, setUser] = useState("");
+  //const [user, setUser] = useState("");
   const [team, setTeam] = useState("");
 
 
-  const [match, setMatch] = useState();
+  //const [match, setMatch] = useState();
 
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
@@ -72,7 +69,7 @@ const CreateMatchComp = () => {
         }
 
         const userData = await response.json();
-        setUser(userData);
+        //setUser(userData);
 
         // Após definir o usuário, busque os dados do time
         fetchUserTeam(userData.id);
@@ -86,16 +83,26 @@ const CreateMatchComp = () => {
   }, []);
 
   const fetchUserTeam = async (userId) => {
+    console.log("\n\nID do usuario na req do time: " + userId + "\n\n");
     try {
       const response = await fetch(
         `${apiURL}/api/user/team/${userId}`
       );
 
       if (!response.ok) {
-        throw new Error("Erro ao carregar dados do time");
+        if (response.status === 404) {
+          console.log("Time não encontrado");
+          throw new Error("Time não encontrado. Você precisa de um time para acessar essa função.");
+        } else {
+          console.log("Erro puxado: " + JSON.stringify(response));
+          throw new Error("Erro ao carregar dados do time");
+        }
       }
-
+  
+      
+      console.log("\n\nO Time puxado: " + response + "\n\n\n");
       const teamData = await response.json();
+
 
       if (Array.isArray(teamData) && teamData.length > 0) {
         const teamId = teamData[0].id;
@@ -104,6 +111,7 @@ const CreateMatchComp = () => {
         throw new Error("Você precisa de um time para acessar essa função");
       }
     } catch (error) {
+      console.log("Erro encontrado: " + error)
       Alert.alert(
         "Crie um time!!",
         error.message,
@@ -161,8 +169,7 @@ const CreateMatchComp = () => {
       contact: contact
     };
 
-    setMatch(matchData)
-    console.log(match)
+    //setMatch(matchData)
 
     try {
       const response = await fetch(`${apiURL}/api/matches/create`, {
@@ -313,10 +320,6 @@ const CreateMatchComp = () => {
           onChange={datePickerChange}
         />
       )}
-      {/* <View style={styles.inputBox}>
-        <TextInput placeholder="--:--" style={styles.input} />
-        <MaterialCommunityIcons name="clock-outline" size={24} color="black" />
-      </View> */}
 
       <FAB
         title="criar partida!!"

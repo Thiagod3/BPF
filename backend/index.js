@@ -12,24 +12,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.delete("/api/user/deletePlayer/:teamId/:playerId", (req, res) => {
-  const teamId = req.params.teamId
-  const playerId = req.params.playerId
+  const teamId = req.params.teamId;
+  const playerId = req.params.playerId;
 
-  const query = "DELETE FROM jogadores WHERE time_id = ? AND usuario_id = ?;"
+  const query = "DELETE FROM jogadores WHERE time_id = ? AND usuario_id = ?;";
 
   conn.query(query, [teamId, playerId], (err, results) => {
-    if(err) {
-      console.log('Erro na busca de jogadores: ' + err)
+    if (err) {
+      console.log("Erro na busca de jogadores: " + err);
       return res.status(500).send("Erro ao buscar Jogadores.");
     }
 
     return res.status(200).send("Usuario: deletado com sucesso");
-  })
-})
+  });
+});
 
 app.get("/api/teamPlayers/:teamId", (req, res) => {
   const teamId = req.params.teamId;
-  //console.log(teamId)
 
   const query = `
   select t.id as ID_Time, t.name as TEAM, t.numberPlayers as Numero_de_Jogadores, j.usuario_id as Jogador_ID, u.name as Jogador, u.position as position, u.image as image, u.description as description
@@ -38,14 +37,13 @@ app.get("/api/teamPlayers/:teamId", (req, res) => {
   join Users as u on j.usuario_id = u.id where t.id = ?`;
 
   conn.query(query, [teamId], (err, results) => {
-    if(err) {
-      console.log('Erro na busca de jogadores: ' + err)
+    if (err) {
+      console.log("Erro na busca de jogadores: " + err);
       return res.status(500).send("Erro ao buscar Jogadores.");
     }
-   
-    return res.status(200).json(results);
 
-  })
+    return res.status(200).json(results);
+  });
 });
 
 app.get("/api/user/team-by-admin/:user_admin_id", (req, res) => {
@@ -61,8 +59,6 @@ app.get("/api/user/team-by-admin/:user_admin_id", (req, res) => {
     if (results.length === 0) {
       return res.status(404).send("Time não encontrado.");
     }
-
-    console.log("Time do admin:" + results[0]);
     res.status(200).json(results[0]);
   });
 });
@@ -70,8 +66,6 @@ app.get("/api/user/team-by-admin/:user_admin_id", (req, res) => {
 // Rota para inserir um novo jogador
 app.post("/api/user/add-player", (req, res) => {
   const { user_id, team_id } = req.body;
-
-  console.log("Usuario: " + user_id + " Time: " + team_id);
 
   if (!user_id || !team_id) {
     return res
@@ -98,7 +92,8 @@ app.post("/api/user/add-player", (req, res) => {
 
       if (adminResult.length === 0) {
         // Se o jogador não for administrador de nenhum time, insira como jogador
-        const insertQuery = "INSERT INTO jogadores (usuario_id, time_id) VALUES (?, ?)";
+        const insertQuery =
+          "INSERT INTO jogadores (usuario_id, time_id) VALUES (?, ?)";
         conn.query(insertQuery, [user_id, team_id], (err, insertResult) => {
           if (err) {
             console.error("Erro ao inserir jogador:", err);
@@ -108,7 +103,9 @@ app.post("/api/user/add-player", (req, res) => {
         });
       } else {
         // Se o jogador for administrador de algum time, retorne um erro
-        return res.status(403).send("Este jogador é um administrador de outro time.");
+        return res
+          .status(403)
+          .send("Este jogador é um administrador de outro time.");
       }
     });
   });
@@ -126,7 +123,7 @@ app.post("/api/user/uploadImage", (req, res) => {
       res.status(500).send("Erro ao atualizar o banco de dados");
       return;
     }
-    console.log("Imagem do usuario atualizada no banco de dados:", result);
+    console.log("Imagem do usuario atualizada no banco de dados:");
     res.status(200).send("Imagem do usuario atualizada com sucesso");
   });
 });
@@ -143,7 +140,7 @@ app.post("/api/team/uploadImage", (req, res) => {
       res.status(500).send("Erro ao atualizar o banco de dados");
       return;
     }
-    console.log("Imagem do time atualizada no banco de dados:", result);
+    console.log("Imagem do time atualizada no banco de dados:");
     res.status(200).send("Imagem do time atualizada com sucesso");
   });
 });
@@ -157,7 +154,6 @@ app.post("/api/team/create", (req, res) => {
     numberOfMatches,
     userId,
   } = req.body;
-  console.log(req.body);
   const sql =
     "INSERT INTO teams (name, description, numberPlayers, numberMatches, user_admin_id) VALUES (?, ?, ?, ?, ?);";
 
@@ -181,7 +177,7 @@ app.post("/api/team/create", (req, res) => {
 app.get("/api/user/team/:id", (req, res) => {
   const userId = req.params.id;
   const sql =
-    "SELECT t.*, u.id AS user_id, u.name AS user_name FROM Teams AS t JOIN Users AS u ON u.id = t.user_admin_id WHERE u.id = ?";
+    "SELECT t.id, t.user_admin_id, t.description, t.numberPlayers, t.name as TEAM ,t.image as teamImage, u.id AS Jogador_ID, u.name AS user_name FROM Teams AS t JOIN Users AS u ON u.id = t.user_admin_id WHERE u.id = ?";
   conn.query(sql, [userId], (err, results) => {
     if (err) {
       console.error("Erro ao consultar banco de dados:", err);
@@ -190,7 +186,28 @@ app.get("/api/user/team/:id", (req, res) => {
         .json({ error: "Erro ao consultar banco de dados" });
     }
 
-    return res.status(200).json(results);
+    if (results.length > 0) {
+      return res.status(200).json(results);
+    }
+
+    const checkPlayerQuery = `
+      select t.id, t.name as TEAM, t.image as teamImage, t.description as description, t.user_admin_id as Admin, j.usuario_id as Jogador_ID, u.name as name
+      from Teams as t
+      join Jogadores as j on t.id = j.time_id
+      join Users as u on j.usuario_id = u.id where j.usuario_id = ?
+    `;
+    conn.query(checkPlayerQuery, [userId], (err, playerResult) => {
+      if (err) {
+        console.error("Erro ao verificar jogador:", err);
+        return res.status(500).send("Erro ao verificar jogador.");
+      }
+
+      if (playerResult.length > 0) {
+        return res.status(200).json(playerResult);
+      }
+
+      return res.status(404).send("Usuario não possui time")
+    });
   });
 });
 
@@ -448,7 +465,6 @@ app.get("/api/teams", (req, res) => {
 });
 
 app.get("/api/teamsNoUser/:id", (req, res) => {
-  console.log("tt" + req.params.teamId);
   const sql = "SELECT * FROM teams WHERE id != " + req.params.id;
   conn.query(query, (err, results) => {
     if (err) {

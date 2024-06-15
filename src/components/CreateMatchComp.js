@@ -11,6 +11,7 @@ import {
 import { CheckBox, FAB } from "@rneui/themed";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation,  } from "@react-navigation/native";
+import { useCallback } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -190,6 +191,12 @@ const CreateMatchComp = () => {
     }
   }
 
+  const refreshPage = useCallback(() => {
+    navigation.navigate('Matches')
+    navigation.replace('Players')
+    navigation.replace('Matches', { key: Math.random().toString() });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <View style={styles.loc}>
@@ -326,7 +333,7 @@ const CreateMatchComp = () => {
         color="#113B8F"
         onPress={() => {
           insereDados();
-          navigation.navigate('Matches');
+          refreshPage();
         }}
         titleStyle={{ color: "#FF731D", fontWeight: "bold", fontSize: 20 }}
         upperCase

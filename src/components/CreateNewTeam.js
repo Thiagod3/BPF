@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Button, Input, FAB } from "@rneui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { useCallback } from "react";
 
 import EditTeamComp from "./EditTeamComp";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -65,35 +66,19 @@ export default function CreateNewTeam() {
       }
 
       console.log("Time novo enviado com sucesso para a API.");
-      navigation.navigate('Team')
+      refreshPage();
     } catch (error) {
       console.error("Erro:", error.message);
     }
   };
 
+  const refreshPage = useCallback(() => {
+    navigation.navigate('Matches')
+    navigation.navigate('Team', { key: Math.random().toString() });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
-      {/* <View style={styles.teamLogoContainer}>
-        <Image
-          style={styles.teamLogo}
-          source={require("../../assets/BoraProFutOutline.png")}
-        />
-        <Button
-          color="#FF731D"
-          icon={
-            <MaterialCommunityIcons
-              name="progress-pencil"
-              size={30}
-              color="black"
-            />
-          }
-          containerStyle={styles.teamPicButton}
-          onPress={() => {
-            handleShowopt();
-            setModalVisible(true);
-          }}
-        />
-      </View> */}
 
       <View style={styles.formContainer}>
         <View style={styles.inputName}>

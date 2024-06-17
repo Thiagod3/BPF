@@ -6,11 +6,11 @@ import {
   TextInput,
   Pressable,
   Platform,
-  Alert 
+  Alert
 } from "react-native";
 import { CheckBox, FAB } from "@rneui/themed";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation,  } from "@react-navigation/native";
+import { useNavigation, } from "@react-navigation/native";
 import { useCallback } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,7 +19,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import apiURL from "../utils/API";
 
 const CreateMatchComp = () => {
-  
+
   const navigation = useNavigation();
 
   const [selectedField, setField] = React.useState(0);
@@ -99,8 +99,8 @@ const CreateMatchComp = () => {
           throw new Error("Erro ao carregar dados do time");
         }
       }
-  
-      
+
+
       console.log("\n\nO Time puxado: " + response + "\n\n\n");
       const teamData = await response.json();
 
@@ -156,6 +156,17 @@ const CreateMatchComp = () => {
 
     return `${day}/${month}/${year}`;
   };
+
+  handleCreateMatch = async () => {
+    //Verifica se dados foram inseridos e são validos
+    if (!city || !location || !contact) {
+      Alert.alert("Dado vazio", "Verifique se todos os campos foram preenchidos!");
+      return
+    } else {
+      insereDados();
+      refreshPage();
+    }
+  }
 
   // objeto que recebe os dados
   async function insereDados() {
@@ -307,7 +318,7 @@ const CreateMatchComp = () => {
         )}
       </View>
 
-      
+
       <Text style={styles.infoText}>Forma de contato: </Text>
       <View style={styles.inputBox}>
         <TextInput
@@ -332,8 +343,7 @@ const CreateMatchComp = () => {
         title="criar partida!!"
         color="#113B8F"
         onPress={() => {
-          insereDados();
-          refreshPage();
+          handleCreateMatch();
         }}
         titleStyle={{ color: "#FF731D", fontWeight: "bold", fontSize: 20 }}
         upperCase

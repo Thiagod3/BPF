@@ -3,7 +3,7 @@ import {
   StyleSheet,
   Text,
   Image,
-  Modal,
+  Alert,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
@@ -32,6 +32,15 @@ export default function CreateNewTeam() {
   const handleShowopt = () => {
     setOpt(!opt);
   };
+
+  const handleCreate = async () => {
+    //Verifica se dados foram inseridos e são validos
+    if (!name) {
+      Alert.alert("Time sem nome", "Seu time precisa de um nome!");
+    } else{
+      handleSubmit();
+    }
+  }
 
   const handleSubmit = async () => {
 
@@ -81,6 +90,8 @@ export default function CreateNewTeam() {
     <View style={styles.container}>
 
       <View style={styles.formContainer}>
+      <Image source={require("../../assets/BoraProFutOutline.png")} />
+      <Text style={styles.infoText}>De um nome e um descrição ao seu time!</Text>
         <View style={styles.inputName}>
           <Input
             rightIcon={
@@ -122,25 +133,9 @@ export default function CreateNewTeam() {
           icon={
             <Ionicons name="add-circle-outline" size={30} color="#FF731D" />
           }
-          onPress={handleSubmit}
+          onPress={handleCreate}
         />
       </View>
-
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.75)" }}
-          onPress={() => setModalVisible(false)}
-        ></TouchableOpacity>
-        <EditTeamComp onClose={() => setModalVisible(false)} />
-      </Modal> */}
     </View>
   );
 }
@@ -151,12 +146,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    marginTop: 50,
+    height: "90%",
     gap: 20,
     borderRadius: 10,
   },
   teamLogoContainer: {
     gap: -50,
+  },
+  infoText:{
+    textAlign:"center",
+    fontWeight: "bold",
+    fontSize: 18,
+    width: "70%",
   },
   teamPicButton: {
     marginLeft: 150,
@@ -176,9 +177,11 @@ const styles = StyleSheet.create({
     width: 200,
   },
   inputName: {
+    alignItems: "center",
     width: "100%",
-    height: 50,
+    height: 60,
     borderBottomWidth: 1,
+    borderTopWidth: 1,
     borderStyle: "solid",
     borderColor: "black",
   },
@@ -191,4 +194,7 @@ const styles = StyleSheet.create({
   createButton: {
     marginTop: 50,
   },
+  buttonDisabled: {
+    backgroundColor: "#113B8F",
+  }
 });

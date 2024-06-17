@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TextInput, ScrollView, FlatList, Keyboard, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TextInput, ScrollView, FlatList, Keyboard, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { Button, ButtonGroup } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +7,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 import TeamCardComp from './TeamCardComp';
-import api from '../../config/api';
 import apiURL from '../utils/API';
 
 export default function FinishMatchComp() {
@@ -111,6 +110,17 @@ export default function FinishMatchComp() {
     setFilteredTeams(filtered);
   };
 
+  const handleFinish = async () => {
+    //Verifica se dados foram inseridos e são validos
+    if (!selectedTeamId) {
+      Alert.alert("Sem adversário", "Você não selecionou um adversário!");
+    }else{
+    incrementMatches();
+    deletaDados();
+    navigation.navigate('Matches');
+    }
+  }
+
   const handleKeyPress = (event) => {
     if (event.nativeEvent.key === 'Enter') {
       Keyboard.dismiss();
@@ -211,11 +221,7 @@ export default function FinishMatchComp() {
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          incrementMatches();
-          deletaDados();
-          navigation.navigate('Matches');
-        }}
+        onPress={handleFinish}
       >
         <Ionicons name="football-outline" size={30} color="#FF731D" />
         <Text style={styles.buttonText}>BORA PRO FUT!!</Text>

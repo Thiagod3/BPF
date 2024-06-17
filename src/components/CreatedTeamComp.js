@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Image,
   Text,
+  Pressable,
   Modal,
   TouchableOpacity,
 } from "react-native";
@@ -10,32 +11,69 @@ import { Button } from "@rneui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import EditTeamComp from "./EditTeamComp";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import EditTeamBioComp from "./EditTeamBioComp";
+import { useNavigation } from "@react-navigation/native";
 
 import TeamPlayersModal from "./TeamPlayersModal";
 
 import renderImage from "../utils/renderImage";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CreateTeamComp({ team, userId }) {
+  const navigation = useNavigation();
+
   const [opt, setOpt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [PlayerAddVisibility, setPlayerAddVisibility] = useState(false);
-
-  // console.log("Admin: " + team[0].user_admin_id)
-  // console.log("Jogador: " + team[0].Jogador_ID)
-  // console.log("Usuario logado: " + userId)
+  const [bioModalVisible, setBioModalVisible] = useState(false);
+  const [bio, setBio] = useState("");
 
   const handleShowopt = () => {
     setOpt(!opt);
   };
 
+  const handleUpdateBio = (newBio) => {
+    setBio(newBio);
+  };
+
+  useEffect(() => {
+    if (bio) {
+      updateBio(team[0].id, bio);
+      refreshPage();
+    }
+  }, [bio, team[0].id]);
+
+  async function updateBio() {
+    try {
+      const response = await fetch(`${apiURL}/api/team/update/bio/${team[0].id}/${bio}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao enviar os dados para a API.');
+      }
+
+      console.log('Dados enviados com sucesso para a API.');
+      refreshPage();
+    } catch (error) {
+      console.error('Erro ao atualizar bio:', error.message);
+    }
+  }
+
+  const refreshPage = useCallback(() => {
+    navigation.navigate('Matches')
+    navigation.navigate('Team', { key: Math.random().toString() });
+  }, [navigation]);
+  
+
   return (
     <View style={styles.container}>
       <View style={styles.teamPic}>
-        {/* <Image source={{ uri: `${team[0].image}`}} style={styles.profilePic} /> */}
         {team[0].teamImage && (
             renderImage(team[0].teamImage)
         ) || (
@@ -67,7 +105,12 @@ export default function CreateTeamComp({ team, userId }) {
           <Text style={styles.teamTitle}>{team[0].TEAM}</Text>
         </View>
         <View style={styles.bioContainer}>
-          <Text style={styles.bioText}>{team[0].description}</Text>
+          <Pressable style={styles.pressable} onPress={() => {
+            setBioModalVisible(true);
+          }}>
+              <Text style={styles.bioText}>{team[0].description}</Text>
+              <Text style={styles.inputText}>Pressione para editar</Text>
+          </Pressable >
         </View>
       </View>
 
@@ -96,7 +139,22 @@ export default function CreateTeamComp({ team, userId }) {
           style={{ flex: 1, backgroundColor: "rgba(1, 1, 1, 0.75)" }}
           onPress={() => setModalVisible(false)}
         ></TouchableOpacity>
-        <EditTeamComp onClose={() => setModalVisible(false)} />
+        <EditTeamComp onClose={() => setModalVisible(false)} team={team} />
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={bioModalVisible}
+        onRequestClose={() => {
+          setBioModalVisible(false);
+        }}
+        containerStyle={styles.modal}
+      >
+        <EditTeamBioComp
+          onUpdateBio={handleUpdateBio}
+          onClose={() => setBioModalVisible(false)}
+        />
       </Modal>
     </View>
   );
@@ -105,6 +163,8 @@ export default function CreateTeamComp({ team, userId }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    justifyContent: "center",
+    height: "70%",
     width: "100%",
     gap: 20,
   },
@@ -141,10 +201,20 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 50,
   },
+  pressable: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    paddingHorizontal: 20,
+  },
   bioText: {
     textAlign: "center",
     fontSize: 20,
     fontWeight: "400",
+  },
+  infoText: {
+    fontSize: 25,
+    fontWeight: "bold",
   },
   memberButton: {
     borderRadius: 10,

@@ -102,8 +102,6 @@ export default function Profile() {
   };
 
   async function updateBio() {
-    console.log('Iniciando atualização da bio...');
-
     try {
       const response = await fetch(`${apiURL}/api/user/update/bio/${user.id}/${bio}`, {
         method: 'PUT',

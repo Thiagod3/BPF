@@ -27,6 +27,36 @@ app.delete("/api/user/deletePlayer/:teamId/:playerId", (req, res) => {
   });
 });
 
+app.delete("/api/user/deleteAllFromTeam/:teamId", (req, res) => {
+  const teamId = req.params.teamId;
+
+  const query = "DELETE FROM jogadores WHERE time_id = ?;";
+
+  conn.query(query, [teamId], (err, results) => {
+    if (err) {
+      console.log("Erro na busca de jogadores: " + err);
+      return res.status(500).send("Erro ao buscar Jogadores.");
+    }
+
+    return res.status(200).send("Usuarios: deletados com sucesso");
+  });
+});
+
+app.delete("/api/user/deleteTeam/:teamId", (req, res) => {
+  const teamId = req.params.teamId;
+
+  const query = "DELETE FROM teams WHERE id = ?;";
+
+  conn.query(query, [teamId], (err, results) => {
+    if (err) {
+      console.log("Erro na busca de Times: " + err);
+      return res.status(500).send("Erro ao buscar Times.");
+    }
+
+    return res.status(200).send("Time: deletado com sucesso");
+  });
+});
+
 app.get("/api/teamPlayers/:teamId", (req, res) => {
   const teamId = req.params.teamId;
 
@@ -342,6 +372,24 @@ app.put("/api/user/update/bio/:id/:newBio", (req, res) => {
   const newBio = req.params.newBio;
 
   const sql = "UPDATE users SET description = ? WHERE id = ?";
+  conn.query(sql, [newBio, id], (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar a bio no banco de dados:", err);
+      res.status(500).json({ error: "Erro interno do servidor." });
+    } else {
+      console.log("Bio atualizada com sucesso.");
+      res
+        .status(200)
+        .json({ message: "Bio atualizada com sucesso: " + result });
+    }
+  });
+});
+
+app.put("/api/team/update/bio/:id/:newBio", (req, res) => {
+  const id = req.params.id;
+  const newBio = req.params.newBio;
+
+  const sql = "UPDATE teams SET description = ? WHERE id = ?";
   conn.query(sql, [newBio, id], (err, result) => {
     if (err) {
       console.error("Erro ao atualizar a bio no banco de dados:", err);

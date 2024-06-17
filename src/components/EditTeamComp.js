@@ -11,11 +11,54 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
-import api from "../../config/api";
 import apiURL from "../utils/API";
 
-const EditTeam = ({ onClose }) => {
+const EditTeam = ({ onClose, team }) => {
   const navigation = useNavigation();
+
+  const deleteAllFromTeam = async (teamId) => {
+    try {
+      const response = await fetch(
+        `${apiURL}/api/user/deleteAllFromTeam/${teamId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao fazer requisição de deletar usuário");
+      }
+
+      if (response.status === 200) {
+        console.log("Jogadores do time: " + teamId + " deletados")
+        deleteTeam(teamId);
+      }
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao deletar o jogador.");
+    }
+  };
+
+  const deleteTeam = async (teamId) => {
+    try {
+      const response = await fetch(
+        `${apiURL}/api/user/deleteTeam/${teamId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao fazer requisição de deletar usuário");
+      }
+
+      if (response.status === 200) {
+        refreshPage();
+      }
+    } catch (error) {
+      console.error("Erro ao deletar o jogador:", error);
+      Alert.alert("Erro", "Erro ao deletar o jogador.");
+    }
+  };
 
   const getCamera = async () => {
     try {
@@ -157,6 +200,12 @@ const EditTeam = ({ onClose }) => {
             <Pressable onPress={pickImage} style={styles.galleryButton}>
               <FontAwesome name="photo" size={32} color="#FF731D" />
               <Text style={styles.buttonText}>Galeria</Text>
+            </Pressable>
+          </View>,
+          <View style={styles.buttonContainer}>
+            <Pressable onPress={() => {deleteAllFromTeam(team[0].id)}} style={styles.galleryButton}>
+            <FontAwesome name="trash" size={32} color="#FF731D" />
+              <Text style={styles.buttonText}>Exluir time</Text>
             </Pressable>
           </View>,
         ]}

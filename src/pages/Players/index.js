@@ -5,41 +5,44 @@ import {
   FlatList,
   Text,
   TextInput,
+  Keyboard,
+  Alert
 } from "react-native";
 import { Button } from "@rneui/themed";
 import HeaderComp from "../../components/HeaderComp.js";
 import PlayerCardComp from "../../components/PlayerCardComp";
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useCallback } from "react";
-
+import { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import api from "../../../config/api.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiURL from "../../utils/API.js";
 
 export default function Players() {
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState("");
   const [error, setError] = useState(null);
   const [search, setSearch] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [showUsersWithoutTeam, setShowUsersWithoutTeam] = useState(true);
 
   const mostrarBotao = true;
-
   useFocusEffect(
     useCallback(() => {
       // Função para buscar usuários da API
       const fetchUsers = async () => {
+        const endpoint = showUsersWithoutTeam
+          ? `${apiURL}/api/users`
+          : `${apiURL}/api/usersWithoutTeam`;
         try {
-          const response = await fetch(
-            `${apiURL}/api/users`
-          );
+          const response = await fetch(endpoint);
           if (!response.ok) {
             throw new Error("Erro ao buscar usuários: " + response.statusText);
           }
           const data = await response.json();
-          // console.log("Dados recebidos:", data); // Log para verificar os dados recebidos
           setUsers(data);
           setFilteredUsers(data);
+          console.log(users[0])
         } catch (error) {
           console.error(error);
           setError(
@@ -47,10 +50,8 @@ export default function Players() {
           );
         }
       };
-
-      // Chamando a função para buscar usuários
       fetchUsers();
-    }, [])
+    }, [showUsersWithoutTeam])
   );
 
   const filterUsers = (text) => {
@@ -71,6 +72,10 @@ export default function Players() {
     filterUsers(searchText);
   };
 
+  const handleToggle = () => {
+    setShowUsersWithoutTeam((prevShowUsersWithoutTeam) => !prevShowUsersWithoutTeam);
+  };
+
   // Função para renderizar cada item da lista de usuários
   const renderItem = ({ item }) => (
     <PlayerCardComp
@@ -82,6 +87,9 @@ export default function Players() {
     /> // Usando o componente PlayerCard
   );
 
+  // Modifiquei a função keyExtractor
+  const keyExtractor = (item, index) => item.id ? item.id.toString() : index.toString();
+
   return (
     <View style={styles.container}>
       {/* Adicionei Horizontal true para tirar um erro de VirtualList */}
@@ -90,7 +98,7 @@ export default function Players() {
           overScrollMode="never"
           data={filteredUsers}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={keyExtractor}
         />
       </ScrollView>
 
@@ -110,6 +118,15 @@ export default function Players() {
           </View>
         </View>
       )}
+
+
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <View style={styles.buttonContainer}>
+        <Button title={showUsersWithoutTeam ? "Mostrar usuários sem time" : "Mostrar Todos os Usuários"} onPress={handleToggle} color={"#113B8F"} />
+      </View>
+
       <View>
         <HeaderComp
           mostrarBotao={mostrarBotao}
@@ -159,5 +176,14 @@ const styles = StyleSheet.create({
     width: "90%",
     borderRadius: 50,
     paddingHorizontal: 30,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 15,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginVertical: 10,
   },
 });

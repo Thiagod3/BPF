@@ -367,6 +367,18 @@ app.get("/api/users", (req, res) => {
   });
 });
 
+app.get("/api/usersWithoutTeam", (req, res) => {
+  const query = "SELECT u.* FROM Users u LEFT JOIN jogadores j ON u.id = j.usuario_id LEFT JOIN teams t ON u.id = t.user_admin_id WHERE j.usuario_id IS NULL AND t.user_admin_id IS NULL";
+  conn.query(query, (err, results) => {
+    if (err) {
+      console.error("Erro ao executar a consulta:", err.message);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 app.put("/api/user/update/bio/:id/:newBio", (req, res) => {
   const id = req.params.id;
   const newBio = req.params.newBio;
